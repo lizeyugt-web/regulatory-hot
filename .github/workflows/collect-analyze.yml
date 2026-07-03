@@ -1,0 +1,53 @@
+name: 采集 + AI 分析
+
+on:
+  schedule:
+    # 每 2 小时运行（UTC 时间，北京时间 = UTC+8）
+    # 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
+    # 对应 北京 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00, 00:00, 02:00, 04:00, 06:00
+    - cron: '0 */2 * * *'
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  collect-and-analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # 超时 30 分钟
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'regulatory-hot/package-lock.json'
+
+      - name: 安装 Next.js 项目依赖
+        run: |
+          cd regulatory-hot
+          npm ci --prefer-offline
+
+      - name: 安装根目录依赖
+        run: npm ci --prefer-offline || npm install
+
+      - name: 采集 FDA 最新信息
+        env:
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+        run: node scripts/collect_fda.cjs --rss-only --no-ai
+
+      - name: AI 分析新增条目
+        env:
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+        run: node scripts/analyze.cjs
+
+      - name: 提交更新数据
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add regulatory-hot/public/data/
+          git diff --staged --quiet || git commit -m "🤖 自动采集+AI分析 [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push

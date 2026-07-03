@@ -1,0 +1,926 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "description": "全球药械监管信息采集源配置",
+    "last_updated": "2026-07-02",
+    "crawl_interval_minutes": 720,
+    "user_agent": "RegulatoryMonitor/1.0 (Research Bot; compliance@example.com)",
+    "request_delay_ms": 3000
+  },
+  "sources": {
+    "regulatory_agencies": {
+      "usa": {
+        "name": "美国",
+        "flag": "🇺🇸",
+        "organizations": {
+          "fda": {
+            "name": "FDA - 美国食品药品监督管理局",
+            "name_en": "U.S. Food and Drug Administration",
+            "base_url": "https://www.fda.gov",
+            "feeds": {
+              "rss": [
+                {
+                  "name": "FDA News Releases",
+                  "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/fdacdernewswhatsnew/rss.xml",
+                  "category": "news",
+                  "language": "en"
+                },
+                {
+                  "name": "FDA Drug Recalls",
+                  "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/drug-recalls/rss.xml",
+                  "category": "recalls",
+                  "language": "en"
+                },
+                {
+                  "name": "FDA Medical Device Recalls",
+                  "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/medical-device-recalls/rss.xml",
+                  "category": "recalls",
+                  "language": "en"
+                },
+                {
+                  "name": "FDA Warning Letters",
+                  "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/warning-letters/rss.xml",
+                  "category": "compliance",
+                  "language": "en"
+                },
+                {
+                  "name": "FDA Guidance Documents",
+                  "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/guidance-documents/rss.xml",
+                  "category": "guidance",
+                  "language": "en"
+                }
+              ],
+              "api": [
+                {
+                  "name": "openFDA Drug Adverse Events",
+                  "endpoint": "https://api.fda.gov/drug/event.json",
+                  "method": "GET",
+                  "params": {
+                    "search": "receivedate:[{since_date}+TO+{now_date}]",
+                    "limit": 100
+                  },
+                  "category": "safety",
+                  "rate_limit": "240 requests/min with API key"
+                },
+                {
+                  "name": "openFDA Drug Labeling",
+                  "endpoint": "https://api.fda.gov/drug/label.json",
+                  "method": "GET",
+                  "params": {
+                    "search": "effective_time:[{since_date}+TO+{now_date}]",
+                    "limit": 100
+                  },
+                  "category": "labeling",
+                  "rate_limit": "240 requests/min with API key"
+                },
+                {
+                  "name": "openFDA Device Adverse Events",
+                  "endpoint": "https://api.fda.gov/device/event.json",
+                  "method": "GET",
+                  "params": {
+                    "search": "date_received:[{since_date}+TO+{now_date}]",
+                    "limit": 100
+                  },
+                  "category": "safety",
+                  "rate_limit": "240 requests/min with API key"
+                },
+                {
+                  "name": "openFDA Device Recall",
+                  "endpoint": "https://api.fda.gov/device/recall.json",
+                  "method": "GET",
+                  "params": {
+                    "search": "recall_initiation_date:[{since_date}+TO+{now_date}]",
+                    "limit": 100
+                  },
+                  "category": "recalls",
+                  "rate_limit": "240 requests/min with API key"
+                },
+                {
+                  "name": "openFDA Drug Enforcement Reports",
+                  "endpoint": "https://api.fda.gov/drug/enforcement.json",
+                  "method": "GET",
+                  "params": {
+                    "search": "report_date:[{since_date}+TO+{now_date}]",
+                    "limit": 100
+                  },
+                  "category": "compliance",
+                  "rate_limit": "240 requests/min with API key"
+                },
+                {
+                  "name": "openFDA Food Recall",
+                  "endpoint": "https://api.fda.gov/food/enforcement.json",
+                  "method": "GET",
+                  "params": {
+                    "search": "report_date:[{since_date}+TO+{now_date}]",
+                    "limit": 100
+                  },
+                  "category": "recalls",
+                  "rate_limit": "240 requests/min with API key"
+                }
+              ],
+              "web_pages": [
+                {
+                  "name": "FDA Advisory Committee Meetings",
+                  "url": "https://www.fda.gov/advisory-committees/advisory-committee-calendar",
+                  "category": "meetings",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "CDER New Drug Approvals",
+                  "url": "https://www.fda.gov/drugs/development-approval-process-drugs/new-drug-approvals",
+                  "category": "approvals",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "FDA Drug Safety Communications",
+                  "url": "https://www.fda.gov/drugs/drug-safety-and-availability/drug-safety-communications",
+                  "category": "safety",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "CDRH Device Approvals and Clearances",
+                  "url": "https://www.fda.gov/medical-devices/device-approvals-denials-and-clearances",
+                  "category": "approvals",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "eu": {
+        "name": "欧盟",
+        "flag": "🇪🇺",
+        "organizations": {
+          "ema": {
+            "name": "EMA - 欧洲药品管理局",
+            "name_en": "European Medicines Agency",
+            "base_url": "https://www.ema.europa.eu",
+            "feeds": {
+              "rss": [
+                {
+                  "name": "EMA News and Events",
+                  "url": "https://www.ema.europa.eu/en/news-events/rss.xml",
+                  "category": "news",
+                  "language": "en"
+                },
+                {
+                  "name": "EMA What's New",
+                  "url": "https://www.ema.europa.eu/en/rss.xml",
+                  "category": "general",
+                  "language": "en"
+                }
+              ],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "CHMP Meeting Highlights",
+                  "url": "https://www.ema.europa.eu/en/committees/chmp/chmp-meeting-highlights",
+                  "category": "meetings",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "PRAC Safety Updates",
+                  "url": "https://www.ema.europa.eu/en/committees/prac/prac-meeting-highlights",
+                  "category": "safety",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "EMA Scientific Guidelines",
+                  "url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-and-development/scientific-guidelines",
+                  "category": "guidance",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "EPAR - European Public Assessment Reports",
+                  "url": "https://www.ema.europa.eu/en/medicines/download-medicine-data",
+                  "category": "approvals",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "EMA Upcoming Meetings",
+                  "url": "https://www.ema.europa.eu/en/about-us/events",
+                  "category": "meetings",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          },
+          "edqm": {
+            "name": "EDQM - 欧洲药品质量管理局",
+            "name_en": "European Directorate for the Quality of Medicines & HealthCare",
+            "base_url": "https://www.edqm.eu",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "EDQM News",
+                  "url": "https://www.edqm.eu/en/news",
+                  "category": "news",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "European Pharmacopoeia Updates",
+                  "url": "https://www.edqm.eu/en/european-pharmacopoeia-ph-eur-updates",
+                  "category": "standards",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          },
+          "hma": {
+            "name": "HMA - 欧盟药品监管机构负责人组织",
+            "name_en": "Heads of Medicines Agencies",
+            "base_url": "https://www.hma.eu",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "HMA News",
+                  "url": "https://www.hma.eu/news.html",
+                  "category": "news",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "china": {
+        "name": "中国",
+        "flag": "🇨🇳",
+        "organizations": {
+          "nmpa": {
+            "name": "NMPA - 国家药品监督管理局",
+            "name_en": "National Medical Products Administration",
+            "base_url": "https://www.nmpa.gov.cn",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "NMPA 法规文件",
+                  "url": "https://www.nmpa.gov.cn/xxgk/fgwj/index.html",
+                  "category": "regulations",
+                  "language": "zh",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "NMPA 公告通告",
+                  "url": "https://www.nmpa.gov.cn/xxgk/ggtg/index.html",
+                  "category": "announcements",
+                  "language": "zh",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "NMPA 政策解读",
+                  "url": "https://www.nmpa.gov.cn/xxgk/zcjd/index.html",
+                  "category": "policy",
+                  "language": "zh",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "NMPA 新闻",
+                  "url": "https://www.nmpa.gov.cn/yaowen/index.html",
+                  "category": "news",
+                  "language": "zh",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          },
+          "cde": {
+            "name": "CDE - 药品审评中心",
+            "name_en": "Center for Drug Evaluation",
+            "base_url": "https://www.cde.org.cn",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "CDE 指导原则",
+                  "url": "https://www.cde.org.cn/main/xxgk/listpage/4b2f8f6a7d8e0c1a3b5d9f2e4c6a8b0d",
+                  "category": "guidance",
+                  "language": "zh",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "CDE 新闻中心",
+                  "url": "https://www.cde.org.cn/main/news/listpage/545b9f2e4c6a8b0d1a3b5d9f2e4c6a8b0d",
+                  "category": "news",
+                  "language": "zh",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "CDE 信息公开",
+                  "url": "https://www.cde.org.cn/main/xxgk/listpage/9f2e4c6a8b0d1a3b5d9f2e4c6a8b0d1a3b",
+                  "category": "general",
+                  "language": "zh",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          },
+          "cfdi": {
+            "name": "CFDI - 食品药品审核查验中心",
+            "name_en": "Center for Food and Drug Inspection",
+            "base_url": "https://www.cfdi.org.cn",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "CFDI 检查公告",
+                  "url": "https://www.cfdi.org.cn/resource/news/index.html",
+                  "category": "inspection",
+                  "language": "zh",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "japan": {
+        "name": "日本",
+        "flag": "🇯🇵",
+        "organizations": {
+          "pmda": {
+            "name": "PMDA - 医药品医疗器械综合机构",
+            "name_en": "Pharmaceuticals and Medical Devices Agency",
+            "base_url": "https://www.pmda.go.jp",
+            "feeds": {
+              "rss": [
+                {
+                  "name": "PMDA English News",
+                  "url": "https://www.pmda.go.jp/english/about-pmda/news-release/rss.xml",
+                  "category": "news",
+                  "language": "en"
+                }
+              ],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "PMDA Review Reports (审査報告書)",
+                  "url": "https://www.pmda.go.jp/english/review-services/reviews/approved-information/drugs/0001.html",
+                  "category": "approvals",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "PMDA Safety Information",
+                  "url": "https://www.pmda.go.jp/english/safety/info-services/0001.html",
+                  "category": "safety",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "PMDA English News List",
+                  "url": "https://www.pmda.go.jp/english/about-pmda/news-release.html",
+                  "category": "news",
+                  "language": "en",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          },
+          "mhlw": {
+            "name": "MHLW - 厚生劳动省",
+            "name_en": "Ministry of Health, Labour and Welfare",
+            "base_url": "https://www.mhlw.go.jp",
+            "feeds": {
+              "rss": [
+                {
+                  "name": "MHLW RSS Feed",
+                  "url": "https://www.mhlw.go.jp/stf/new-info/rss.xml",
+                  "category": "news",
+                  "language": "ja",
+                  "scrape_method": "rss"
+                }
+              ],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "MHLW Pharmaceutical Affairs",
+                  "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iyakuhin/index.html",
+                  "category": "regulations",
+                  "language": "ja",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "korea": {
+        "name": "韩国",
+        "flag": "🇰🇷",
+        "organizations": {
+          "mfds": {
+            "name": "MFDS - 食品药品安全部",
+            "name_en": "Ministry of Food and Drug Safety",
+            "base_url": "https://www.mfds.go.kr",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "MFDS English News",
+                  "url": "https://www.mfds.go.kr/eng/brd/m_57/list.do",
+                  "category": "news",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "MFDS English Policy",
+                  "url": "https://www.mfds.go.kr/eng/brd/m_65/list.do",
+                  "category": "policy",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "MFDS Korean Press Releases",
+                  "url": "https://www.mfds.go.kr/brd/m_99/list.do",
+                  "category": "news",
+                  "language": "ko",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "switzerland": {
+        "name": "瑞士",
+        "flag": "🇨🇭",
+        "organizations": {
+          "swissmedic": {
+            "name": "Swissmedic - 瑞士药品监管局",
+            "name_en": "Swiss Agency for Therapeutic Products",
+            "base_url": "https://www.swissmedic.ch",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "Swissmedic News",
+                  "url": "https://www.swissmedic.ch/swissmedic/en/home/news.html",
+                  "category": "news",
+                  "language": "en",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "uk": {
+        "name": "英国",
+        "flag": "🇬🇧",
+        "organizations": {
+          "mhra": {
+            "name": "MHRA - 英国药品和保健品监管局",
+            "name_en": "Medicines and Healthcare products Regulatory Agency",
+            "base_url": "https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "MHRA News and Alerts",
+                  "url": "https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency",
+                  "category": "news",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "MHRA Drug Safety Update",
+                  "url": "https://www.gov.uk/drug-safety-update",
+                  "category": "safety",
+                  "language": "en",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "canada": {
+        "name": "加拿大",
+        "flag": "🇨🇦",
+        "organizations": {
+          "health_canada": {
+            "name": "Health Canada - 加拿大卫生部",
+            "name_en": "Health Canada",
+            "base_url": "https://www.canada.ca/en/health-canada.html",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "Health Canada Drug and Health Products",
+                  "url": "https://www.canada.ca/en/health-canada/services/drugs-health-products.html",
+                  "category": "general",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "Health Canada Recalls and Safety Alerts",
+                  "url": "https://healthycanadians.gc.ca/recall-alert-rappel-avis/index-eng.php",
+                  "category": "safety",
+                  "language": "en",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "australia": {
+        "name": "澳大利亚",
+        "flag": "🇦🇺",
+        "organizations": {
+          "tga": {
+            "name": "TGA - 澳大利亚药品管理局",
+            "name_en": "Therapeutic Goods Administration",
+            "base_url": "https://www.tga.gov.au",
+            "feeds": {
+              "rss": [],
+              "api": [],
+              "web_pages": [
+                {
+                  "name": "TGA News",
+                  "url": "https://www.tga.gov.au/news/news",
+                  "category": "news",
+                  "language": "en",
+                  "scrape_method": "html"
+                },
+                {
+                  "name": "TGA Safety Alerts",
+                  "url": "https://www.tga.gov.au/safety/safety-alerts",
+                  "category": "safety",
+                  "language": "en",
+                  "scrape_method": "html"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "international_organizations": {
+      "name": "国际组织",
+      "organizations": {
+        "who": {
+          "name": "WHO - 世界卫生组织",
+          "name_en": "World Health Organization",
+          "base_url": "https://www.who.int",
+          "feeds": {
+            "rss": [
+              {
+                "name": "WHO News Releases",
+                "url": "https://www.who.int/rss-feeds/news-english.xml",
+                "category": "news",
+                "language": "en"
+              },
+              {
+                "name": "WHO Essential Medicines",
+                "url": "https://www.who.int/medicines/news/rss/en/",
+                "category": "medicines",
+                "language": "en"
+              }
+            ],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "WHO Prequalification of Medicines",
+                "url": "https://extranet.who.int/prequal/medicines",
+                "category": "medicines",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "WHO International Pharmacopoeia",
+                "url": "https://www.who.int/teams/health-product-and-policy-standards/standards-and-specifications/norms-and-standards-for-pharmaceuticals/pharmacopoeia",
+                "category": "standards",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "WHO Pharmaceutical Newsletter",
+                "url": "https://www.who.int/teams/health-product-and-policy-standards/standards-and-specifications/pharmaceutical-newsletter",
+                "category": "newsletter",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "ich": {
+          "name": "ICH - 国际人用药品注册技术协调会",
+          "name_en": "International Council for Harmonisation",
+          "base_url": "https://www.ich.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "ICH Guidelines",
+                "url": "https://www.ich.org/page/ich-guidelines",
+                "category": "guidance",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "ICH News",
+                "url": "https://www.ich.org/page/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "ICH Meetings",
+                "url": "https://www.ich.org/page/meetings",
+                "category": "meetings",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "pics": {
+          "name": "PIC/S - 药品检查合作计划",
+          "name_en": "Pharmaceutical Inspection Co-operation Scheme",
+          "base_url": "https://picscheme.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "PIC/S News",
+                "url": "https://picscheme.org/en/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "PIC/S Publications",
+                "url": "https://picscheme.org/en/publications",
+                "category": "guidance",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "imdrf": {
+          "name": "IMDRF - 国际医疗器械监管者论坛",
+          "name_en": "International Medical Device Regulators Forum",
+          "base_url": "https://www.imdrf.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "IMDRF Documents",
+                "url": "https://www.imdrf.org/documents/documents.asp",
+                "category": "guidance",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "IMDRF Consultations",
+                "url": "https://www.imdrf.org/consultations/consultations.asp",
+                "category": "consultations",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "iso": {
+          "name": "ISO - 国际标准化组织",
+          "name_en": "International Organization for Standardization",
+          "base_url": "https://www.iso.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "ISO Standards Catalogue - Healthcare",
+                "url": "https://www.iso.org/ics/11/x/",
+                "category": "standards",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "industry_organizations": {
+      "name": "行业/专业组织",
+      "organizations": {
+        "ispe": {
+          "name": "ISPE - 国际制药工程协会",
+          "name_en": "International Society for Pharmaceutical Engineering",
+          "base_url": "https://ispe.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "ISPE News",
+                "url": "https://ispe.org/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "ISPE Guidance Documents",
+                "url": "https://ispe.org/publications/guidance-documents",
+                "category": "guidance",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "pda": {
+          "name": "PDA - 注射剂协会",
+          "name_en": "Parenteral Drug Association",
+          "base_url": "https://www.pda.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "PDA News",
+                "url": "https://www.pda.org/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "PDA Technical Reports",
+                "url": "https://www.pda.org/publications/technical-reports",
+                "category": "guidance",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "raps": {
+          "name": "RAPS - 监管事务专业协会",
+          "name_en": "Regulatory Affairs Professionals Society",
+          "base_url": "https://www.raps.org",
+          "feeds": {
+            "rss": [
+              {
+                "name": "RAPS Regulatory Focus",
+                "url": "https://www.raps.org/news-and-articles/rss-feeds",
+                "category": "news",
+                "language": "en"
+              }
+            ],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "RAPS News and Articles",
+                "url": "https://www.raps.org/news-and-articles",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "dia": {
+          "name": "DIA - 药物信息协会",
+          "name_en": "Drug Information Association",
+          "base_url": "https://www.diaglobal.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "DIA News",
+                "url": "https://www.diaglobal.org/en/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "DIA Events",
+                "url": "https://www.diaglobal.org/en/meetings-and-events",
+                "category": "meetings",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "usp": {
+          "name": "USP - 美国药典委员会",
+          "name_en": "United States Pharmacopeia",
+          "base_url": "https://www.usp.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "USP News",
+                "url": "https://www.usp.org/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              },
+              {
+                "name": "USP Notices",
+                "url": "https://www.usp.org/public-policy/regulatory-notices",
+                "category": "standards",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "phrma": {
+          "name": "PhRMA - 美国药品研究与制造商协会",
+          "name_en": "Pharmaceutical Research and Manufacturers of America",
+          "base_url": "https://www.phrma.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "PhRMA News",
+                "url": "https://www.phrma.org/news",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "efpia": {
+          "name": "EFPIA - 欧洲制药工业协会联合会",
+          "name_en": "European Federation of Pharmaceutical Industries and Associations",
+          "base_url": "https://www.efpia.eu",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "EFPIA News",
+                "url": "https://www.efpia.eu/news-events/",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "advamed": {
+          "name": "AdvaMed - 先进医疗技术协会",
+          "name_en": "Advanced Medical Technology Association",
+          "base_url": "https://www.advamed.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "AdvaMed News",
+                "url": "https://www.advamed.org/news/",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        },
+        "medtech_europe": {
+          "name": "MedTech Europe - 欧洲医疗技术协会",
+          "name_en": "MedTech Europe",
+          "base_url": "https://www.medtecheurope.org",
+          "feeds": {
+            "rss": [],
+            "api": [],
+            "web_pages": [
+              {
+                "name": "MedTech Europe News",
+                "url": "https://www.medtecheurope.org/news-and-events/news/",
+                "category": "news",
+                "language": "en",
+                "scrape_method": "html"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

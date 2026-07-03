@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "version": "3.0.0",
+    "description": "FDA 官方信息采集配置 — 卡兹克风格：RSS + 网页，砍掉 openFDA API 噪音",
+    "last_updated": "2026-07-03",
+    "request_delay_ms": 2000,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+  },
+  "fda": {
+    "base_url": "https://www.fda.gov",
+
+    "rss_feeds": {
+      "description": "FDA 官方 RSS — 5 个高价值频道",
+      "feeds": {
+        "press_releases": {
+          "name": "FDA Press Releases (新闻发布)",
+          "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/press-releases/rss.xml",
+          "category": "insight",
+          "subcategory": ["政策声明"],
+          "importance": 4
+        },
+        "drugs_new": {
+          "name": "What's New: Drugs (药品最新动态)",
+          "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/drugs/rss.xml",
+          "category": "approval",
+          "subcategory": ["新药批准"],
+          "importance": 4
+        },
+        "biologics_new": {
+          "name": "What's New: Vaccines, Blood and Biologics (疫苗/血液/生物制品)",
+          "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/biologics/rss.xml",
+          "category": "approval",
+          "subcategory": ["新药批准"],
+          "importance": 4
+        },
+        "medwatch": {
+          "name": "MedWatch Safety Alerts (医疗产品安全警报)",
+          "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/medwatch/rss.xml",
+          "category": "safety",
+          "subcategory": ["安全警戒", "召回"],
+          "importance": 5
+        },
+        "recalls": {
+          "name": "FDA Recalls (召回信息)",
+          "url": "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/recalls/rss.xml",
+          "category": "safety",
+          "subcategory": ["召回"],
+          "importance": 5
+        }
+      }
+    },
+
+    "federal_register": {
+      "description": "Federal Register RSS — FDA 法规/草案/通知的法定发布渠道",
+      "base_url": "https://www.federalregister.gov/api/v1",
+      "feeds": {
+        "fr_rules": {
+          "name": "Federal Register: FDA Final Rules (最终法规)",
+          "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=food-and-drug-administration&conditions[type]=RULE",
+          "category": "regulation",
+          "subcategory": ["法规发布"],
+          "importance": 5
+        },
+        "fr_proposed_rules": {
+          "name": "Federal Register: FDA Proposed Rules (法规草案)",
+          "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=food-and-drug-administration&conditions[type]=PROPOSED+RULE",
+          "category": "regulation",
+          "subcategory": ["草案征求意见"],
+          "importance": 4
+        },
+        "fr_notices": {
+          "name": "Federal Register: FDA Notices (官方通知)",
+          "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions[agencies][]=food-and-drug-administration&conditions[type]=NOTICE",
+          "category": "insight",
+          "subcategory": ["政策声明"],
+          "importance": 3
+        }
+      }
+    },
+
+    "web_pages": {
+      "description": "关键网页监控 — 8 个无 RSS 的高价值页面",
+      "pages": {
+        "drug_approvals": {
+          "name": "CDER 新药批准",
+          "url": "https://www.fda.gov/drugs/development-approval-process-drugs/new-drug-approvals",
+          "category": "approval",
+          "subcategory": ["新药批准"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        },
+        "drug_safety_communications": {
+          "name": "药品安全通讯列表",
+          "url": "https://www.fda.gov/drugs/drug-safety-and-availability/drug-safety-communications",
+          "category": "safety",
+          "subcategory": ["安全警戒"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        },
+        "device_approvals": {
+          "name": "CDRH 器械批准与许可",
+          "url": "https://www.fda.gov/medical-devices/device-approvals-denials-and-clearances",
+          "category": "approval",
+          "subcategory": ["新药批准"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        },
+        "guidance_database": {
+          "name": "指南文件数据库",
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents",
+          "category": "regulation",
+          "subcategory": ["指南发布"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        },
+        "warning_letters_page": {
+          "name": "警告信列表",
+          "url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+          "category": "safety",
+          "subcategory": ["警告信"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        },
+        "drug_shortages": {
+          "name": "药品短缺信息",
+          "url": "https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages",
+          "category": "safety",
+          "subcategory": ["安全警戒"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        },
+        "advisory_committee": {
+          "name": "咨询委员会会议日历",
+          "url": "https://www.fda.gov/advisory-committees/advisory-committee-calendar",
+          "category": "insight",
+          "subcategory": ["咨询委员会", "会议活动"],
+          "importance": 4,
+          "scrape_frequency": "daily"
+        },
+        "recalls_market_withdrawals": {
+          "name": "召回与市场撤回",
+          "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+          "category": "safety",
+          "subcategory": ["召回"],
+          "importance": 5,
+          "scrape_frequency": "daily"
+        }
+      }
+    }
+  }
+}

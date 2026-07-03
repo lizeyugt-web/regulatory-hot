@@ -1,0 +1,28 @@
+{
+  "name": "regulatory-monitor",
+  "version": "1.0.0",
+  "description": "Global Regulatory Intelligence Monitoring Platform",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "crawl": "node scripts/crawl_once.js",
+    "analyze": "node scripts/analyze.js",
+    "test": "node scripts/test.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.0",
+    "@fastify/static": "^7.0.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0",
+    "fast-xml-parser": "^5.9.3",
+    "fastify": "^4.28.0",
+    "playwright": "^1.45.0",
+    "rss-parser": "^3.13.0",
+    "sql.js": "^1.10.0"
+  },
+  "devDependencies": {
+    "pino-pretty": "^11.0.0"
+  }
+}
