@@ -12,6 +12,8 @@ jobs:
   collect-and-analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 60  # 60 分钟（FDA 17min + 微信 1min + AI 12并发 80条 ~2min + 余量）
+    permissions:
+      contents: write   # 允许 push commit
 
     steps:
       - name: 检出代码
