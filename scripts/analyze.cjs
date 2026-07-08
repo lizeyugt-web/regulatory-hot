@@ -43,12 +43,14 @@ loadEnv();
 const AI_CONFIG = {
   baseUrl: process.env.SILICONFLOW_BASE_URL || 'https://api.siliconflow.cn/v1',
   apiKey: process.env.SILICONFLOW_API_KEY || '',
-  // 一步完成模型：DeepSeek-V3.2（分析推理）
-  model: 'deepseek-ai/DeepSeek-V3.2',
-  maxTokens: 1024,
+  // 一步完成模型：默认用 Qwen3.5-35B-A3B（~3x 快于 DeepSeek-V3.2）
+  // 可通过 env SILICONFLOW_MODEL / AI_CONCURRENCY 覆盖
+  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen3.5-35B-A3B',
+  maxTokens: 600,                        // 摘要+推荐+评分 ≈ 400 tokens
   temperature: 0.3,
-  delayMs: 500,
-  maxRetries: 3,
+  delayMs: 50,                           // 12 并发后降低单批间隔
+  maxRetries: 2,                         // 失败快速跳过
+  concurrency: parseInt(process.env.AI_CONCURRENCY || '12'),
 };
 
 const PRICING = { 'deepseek-ai/DeepSeek-V3.2': { input: 4.00, output: 6.00 } };
@@ -294,41 +296,49 @@ async function main() {
     return;
   }
 
-  // 正式分析
+  // 正式分析（并发池）
   const totalCost = { total: 0 };
   let doneCount = 0;
   let errorCount = 0;
   const startTime = Date.now();
+  const concurrency = AI_CONFIG.concurrency;
 
-  for (let i = 0; i < toAnalyze.length; i++) {
-    const event = toAnalyze[i];
-    const idx = items.findIndex(e => e.id === event.id);
-    const label = (event.titleEn || event.title || '').slice(0, 50);
-
-    try {
-      process.stdout.write(`[${i + 1}/${toAnalyze.length}] ${label}... `);
-      const r = await analyzeOneStep(event, totalCost);
-      items[idx] = event;
-      doneCount++;
-      console.log(`✅ ¥${r.cost.toFixed(4)}`);
-
-      // 每 10 条写一次磁盘 + 更新进度
-      if (doneCount % 10 === 0 || i === toAnalyze.length - 1) {
-        data.items = items;
-        data.updated = new Date().toISOString();
-        fs.writeFileSync(EVENTS_FILE, JSON.stringify(data, null, 2), 'utf8');
-        saveProgress({
-          total: items.length,
-          completed: items.filter(e => e.aiSummaryCn).length,
-          pending: items.length - items.filter(e => e.aiSummaryCn).length,
-        });
+  for (let batch = 0; batch < toAnalyze.length; batch += concurrency) {
+    const batchItems = toAnalyze.slice(batch, Math.min(batch + concurrency, toAnalyze.length));
+    const tasks = batchItems.map(async (event, bi) => {
+      const idx = items.findIndex(e => e.id === event.id);
+      const label = (event.titleEn || event.title || '').slice(0, 50);
+      const seqNum = batch + bi + 1;
+      try {
+        const r = await analyzeOneStep(event, totalCost);
+        items[idx] = event;
+        return { seqNum, label, cost: r.cost, ok: true };
+      } catch (err) {
+        return { seqNum, label, error: err.message, ok: false };
       }
-    } catch (err) {
-      console.log(`❌ ${err.message}`);
-      errorCount++;
+    });
+    const results = await Promise.all(tasks);
+    for (const r of results) {
+      if (r.ok) {
+        doneCount++;
+        process.stdout.write(`  [${r.seqNum}/${toAnalyze.length}] OK ${r.label.slice(0, 40)} CNY${r.cost.toFixed(4)}\n`);
+      } else {
+        errorCount++;
+        process.stdout.write(`  [${r.seqNum}/${toAnalyze.length}] ERR ${r.error.slice(0, 60)}\n`);
+      }
     }
-
-    if (i < toAnalyze.length - 1) await sleep(AI_CONFIG.delayMs);
+    // 每批写一次磁盘 + 更新进度
+    data.items = items;
+    data.updated = new Date().toISOString();
+    fs.writeFileSync(EVENTS_FILE, JSON.stringify(data, null, 2), 'utf8');
+    saveProgress({
+      total: items.length,
+      completed: items.filter(e => e.aiSummaryCn).length,
+      pending: items.length - items.filter(e => e.aiSummaryCn).length,
+    });
+    if (batch + concurrency < toAnalyze.length) {
+      await sleep(AI_CONFIG.delayMs);
+    }
   }
 
   // 最终写入

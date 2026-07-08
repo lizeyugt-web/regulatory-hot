@@ -19,11 +19,14 @@ const path = require('path');
 const DEFAULT_CONFIG = {
   baseUrl: process.env.SILICONFLOW_BASE_URL || 'https://api.siliconflow.cn/v1',
   apiKey: process.env.SILICONFLOW_API_KEY || '',
-  model: 'deepseek-ai/DeepSeek-V3.2',  // 默认用 DeepSeek，避免 Qwen thinking 模式 content 为空
-  maxTokens: 1024,
+  // 改用 Qwen3.5-35B-A3B：~3x 快于 DeepSeek-V3.2，价格更便宜
+  // 可通过 env SILICONFLOW_MODEL 覆盖
+  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen3.5-35B-A3B',
+  maxTokens: 600,         // 摘要 150-250 字 + 推荐 + 评分 ≈ 400 tokens，省一半
   temperature: 0.3,
-  concurrency: 5,
-  maxRetries: 3,
+  concurrency: 12,        // 5 -> 12（硅基流动允许 ~60 req/min，12 并发安全）
+  maxRetries: 2,          // 3 -> 2（失败快速跳过）
+  requestTimeoutMs: 25000 // 30s -> 25s 硬超时
 };
 
 const PRICING = {
