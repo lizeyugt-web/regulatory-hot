@@ -175,16 +175,20 @@ async function analyzeOneStep(event, totalCost) {
     { maxTokens: AI_CONFIG.maxTokens, temperature: AI_CONFIG.temperature }
   );
 
-  // 解析 JSON
-  let parsed;
-  try {
-    parsed = JSON.parse(result.content);
-  } catch {
-    const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+  // 解析 JSON（容错：可能含 markdown code fence）
+  let parsed = {};
+  let rawContent = (result.content || '').trim();
+  // 去 ```json ... ``` 包裹
+  rawContent = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+  // 尝试 1：直接 parse
+  try { parsed = JSON.parse(rawContent); }
+  catch {
+    // 尝试 2：抓第一个 { ... } 块
+    const jsonMatch = rawContent.match(/\{[\s\S]*?\}/);
     if (jsonMatch) {
       try { parsed = JSON.parse(jsonMatch[0]); }
       catch { parsed = {}; }
-    } else { parsed = {}; }
+    }
   }
 
   const outputTokens = result.usage.completionTokens;
