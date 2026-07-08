@@ -11,7 +11,7 @@ on:
 jobs:
   collect-and-analyze:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # 超时 30 分钟
+    timeout-minutes: 45  # 超时 45 分钟（FDA + 微信 + AI 一起跑）
 
     steps:
       - name: 检出代码
@@ -72,11 +72,11 @@ jobs:
       # ===== 阶段 3：AI 分析 =====
       # 中文文章（微信/FDA 中文公告）走 isChinese 分支，prompt 中无 contentCn 翻译要求
       # 其他语言（英文/日文）保留原有翻译逻辑
-      - name: AI 分析新增条目
+      - name: AI 分析新增条目（每次最多 80 条，5 并发 ~2 分钟）
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
-        run: node scripts/analyze.cjs
+        run: node scripts/analyze.cjs --limit=80
 
       # ===== 阶段 4：提交 =====
       - name: 提交更新数据
