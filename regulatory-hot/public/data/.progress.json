@@ -1,9 +1,9 @@
 {
-  "total": 440,
+  "total": 439,
   "completed": 200,
-  "pending": 240,
-  "lastRun": "2026-07-08T17:49:47.585Z",
-  "lastDuration": "215s",
-  "lastCost": "0.1117",
-  "updatedAt": "2026-07-08T17:49:47.585Z"
+  "pending": 239,
+  "lastRun": "2026-07-08T19:22:16.156Z",
+  "lastDuration": "203s",
+  "lastCost": "0.1118",
+  "updatedAt": "2026-07-08T19:22:16.156Z"
 }
