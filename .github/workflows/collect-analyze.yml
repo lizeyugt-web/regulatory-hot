@@ -32,11 +32,16 @@ jobs:
       - name: 安装根目录依赖
         run: npm ci --prefer-offline || npm install
 
+      - name: 安装 Playwright 浏览器（FDA 采集用）
+        run: npx playwright install chromium 2>&1 | tail -5
+
       # ===== 阶段 1：FDA 采集 =====
+      # 失败不阻塞微信采集（FDA 偶发问题不应拖垮整条流水线）
       - name: 采集 FDA 最新信息（完整采集：RSS + FR + Web）
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+        continue-on-error: true
         run: node scripts/collect_fda.cjs
 
       # ===== 阶段 2：微信公众号采集（直连 3443，v3.0）=====
