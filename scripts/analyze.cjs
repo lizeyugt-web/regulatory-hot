@@ -43,9 +43,10 @@ loadEnv();
 const AI_CONFIG = {
   baseUrl: process.env.SILICONFLOW_BASE_URL || 'https://api.siliconflow.cn/v1',
   apiKey: process.env.SILICONFLOW_API_KEY || '',
-  // 一步完成模型：默认用 Qwen3.5-35B-A3B（~3x 快于 DeepSeek-V3.2）
+  // 一步完成模型：默认用 Qwen2.5-72B-Instruct（直接输出 JSON，不进入 thinking 模式）
+  // Qwen3.5-35B-A3B 在硅基流动上总是 thinking，content 为空
   // 可通过 env SILICONFLOW_MODEL / AI_CONCURRENCY 覆盖
-  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen3.5-35B-A3B',
+  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen2.5-72B-Instruct',
   maxTokens: 600,                        // 摘要+推荐+评分 ≈ 400 tokens
   temperature: 0.3,
   delayMs: 50,                           // 12 并发后降低单批间隔
@@ -88,6 +89,8 @@ async function chatCompletion(messages, { maxTokens = 1024, temperature = 0.3 } 
           messages,
           max_tokens: maxTokens,
           temperature,
+          // 关掉 Qwen thinking 模式（确保 content 直接有内容）
+          chat_template_kwargs: { enable_thinking: false },
         }),
       });
 
@@ -103,7 +106,9 @@ async function chatCompletion(messages, { maxTokens = 1024, temperature = 0.3 } 
       }
 
       const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || '';
+      const msg = data.choices?.[0]?.message || {};
+      // Qwen3.5 thinking 模型：content 可能为空，真内容在 reasoning_content
+      const content = msg.content || msg.reasoning_content || '';
       const usage = data.usage || {};
       return {
         content,

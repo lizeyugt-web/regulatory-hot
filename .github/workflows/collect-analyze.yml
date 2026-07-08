@@ -74,11 +74,11 @@ jobs:
       # ===== 阶段 3：AI 分析 =====
       # 中文文章（微信/FDA 中文公告）走 isChinese 分支，prompt 中无 contentCn 翻译要求
       # 其他语言（英文/日文）保留原有翻译逻辑
-      - name: AI 分析新增条目（Qwen3.5 模型，12 并发，limit=150）
+      - name: AI 分析新增条目（Qwen2.5-72B，12 并发，limit=150）
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
-          SILICONFLOW_MODEL: 'Qwen/Qwen3.5-35B-A3B'
+          SILICONFLOW_MODEL: 'Qwen/Qwen2.5-72B-Instruct'
           AI_CONCURRENCY: '12'
         run: node scripts/analyze.cjs --limit=150
 
