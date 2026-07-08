@@ -32,18 +32,48 @@ jobs:
       - name: 安装根目录依赖
         run: npm ci --prefer-offline || npm install
 
-      - name: 采集 FDA 最新信息
+      # ===== 阶段 1：FDA 采集 =====
+      - name: 采集 FDA 最新信息（完整采集：RSS + FR + Web）
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
-        run: node scripts/collect_fda.cjs --rss-only --no-ai
+        run: node scripts/collect_fda.cjs
 
+      # ===== 阶段 2：微信公众号采集（直连 3443，v3.0）=====
+      # v3.0 起改为 GitHub Actions 直连 wechat-article-exporter：47.107.133.169:3443
+      # 不再需要 SSH 跳板 / SCP 下载（不再依赖阿里云 collector）
+      # 7 天过滤 + 并发抓正文 markdown
+      - name: 采集微信公众号文章（直连 3443，v3.0）
+        env:
+          WX_EXPORTER_HOST: '47.107.133.169'
+          WX_EXPORTER_PORT: '3443'
+          WX_EXPORTER_PROTOCOL: 'https'
+          WX_AUTH_KEY: ${{ secrets.WECHAT_AUTH_KEY }}
+          # 仅保留 7 天内的文章
+          RECENT_DAYS: '7'
+          # 每个公众号最多取 20 篇
+          ARTICLE_LIMIT: '20'
+          # 抓正文并发 3 路，单篇 30s 超时
+          CONTENT_CONCURRENCY: '3'
+          CONTENT_TIMEOUT_MS: '30000'
+          CONTENT_MAX_CHARS: '30000'
+          # 输出到 regulatory-hot/public/data/wechat-articles.json
+          OUTPUT_FILE: 'regulatory-hot/public/data/wechat-articles.json'
+        run: node scripts/collect_wechat_v2.cjs
+
+      - name: 合并微信文章到 events.json
+        run: node scripts/merge_wechat.cjs
+
+      # ===== 阶段 3：AI 分析 =====
+      # 中文文章（微信/FDA 中文公告）走 isChinese 分支，prompt 中无 contentCn 翻译要求
+      # 其他语言（英文/日文）保留原有翻译逻辑
       - name: AI 分析新增条目
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
         run: node scripts/analyze.cjs
 
+      # ===== 阶段 4：提交 =====
       - name: 提交更新数据
         run: |
           git config user.name "github-actions[bot]"
