@@ -55,41 +55,30 @@ const TARGET_MP_LIST = [
 ];
 
 // ============ 时间工具 ============
-function beijingNow() {
-  // 北京时间 = UTC + 8
-  const now = new Date();
-  now.setHours(now.getHours() + 8);
-  return now;
-}
+// 所有函数返回 UTC Date 对象，不受本地时区影响
+// 核心思路：先构造"北京时间的日期值"的 UTC 午夜，再减去 8h 偏移得到实际 UTC 时刻
 
-function beijingISO(d) {
-  // 返回北京时间的 ISO 字符串（伪装成 UTC）
-  const bj = new Date(d);
-  bj.setHours(bj.getHours() + 8);
-  return bj.toISOString().replace('Z', '+08:00');
+const BJ_MS = 8 * 60 * 60 * 1000; // 北京时间偏移 8h
+
+function beijingNow() {
+  // 返回一个 Date，其 UTC 分量等同于北京时间（方便取年月日）
+  return new Date(Date.now() + BJ_MS);
 }
 
 function todayBeijingStart() {
   const bj = beijingNow();
-  bj.setHours(0, 0, 0, 0);
-  bj.setHours(bj.getHours() - 8); // 转回 UTC
-  return bj;
+  // UTC 午夜 - 8h = 北京时间 00:00 的实际 UTC 时刻
+  return new Date(Date.UTC(bj.getUTCFullYear(), bj.getUTCMonth(), bj.getUTCDate()) - BJ_MS);
 }
 
 function yesterdayBeijingStart() {
   const bj = beijingNow();
-  bj.setDate(bj.getDate() - 1);
-  bj.setHours(0, 0, 0, 0);
-  bj.setHours(bj.getHours() - 8);
-  return bj;
+  bj.setUTCDate(bj.getUTCDate() - 1);
+  return new Date(Date.UTC(bj.getUTCFullYear(), bj.getUTCMonth(), bj.getUTCDate()) - BJ_MS);
 }
 
 function yesterdayBeijingEnd() {
-  const bj = beijingNow();
-  bj.setDate(bj.getDate() - 1);
-  bj.setHours(23, 59, 59, 999);
-  bj.setHours(bj.getHours() - 8);
-  return bj;
+  return new Date(yesterdayBeijingStart().getTime() + 24 * 3600_000 - 1);
 }
 
 /**
