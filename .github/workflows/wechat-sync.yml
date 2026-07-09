@@ -23,11 +23,8 @@ jobs:
         with:
           node-version: '22'
 
-      - name: 安装 Prisma 依赖 (regulatory-hot)
-        working-directory: regulatory-hot
-        run: |
-          npm install 2>&1 | tail -3
-          npx prisma generate 2>&1 | tail -3
+      - name: 安装 Prisma 依赖
+        run: cd regulatory-hot && npm install --no-save @prisma/client@7 @prisma/adapter-libsql@7 2>&1 | tail -5
 
       # ===== AI 分析新增条目 =====
       - name: AI 分析新增条目
