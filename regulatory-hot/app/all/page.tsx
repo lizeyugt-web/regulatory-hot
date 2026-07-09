@@ -1,9 +1,8 @@
 import { EventCard } from '@/components/event/EventCard';
 import { FilterToolbar } from '@/components/event/FilterToolbar';
 import { HotTopicsPanel } from '@/components/event/HotTopicsPanel';
-import { AiProgressBar } from '@/components/event/AiProgressBar';
 import { CATEGORIES, SUB_CATEGORIES, type CategoryId } from '@/lib/config';
-import { getEvents, getStats, getAiProgress } from '@/lib/events-data';
+import { getEvents, getStats } from '@/lib/events-data';
 import type { RegulatoryEvent } from '@/lib/types';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
@@ -26,8 +25,8 @@ export default function AllPage({ searchParams }: PageProps) {
 
   const allEvents = getEvents();
   const stats = getStats();
-  const aiProgress = getAiProgress();
   const tagStats = computeTagStats(allEvents);
+  const aiProgress = { completed: allEvents.filter(e => e.aiAnalyzedAt).length, total: allEvents.length };
 
   let events = allEvents;
 
@@ -80,19 +79,12 @@ export default function AllPage({ searchParams }: PageProps) {
               <span className="text-ink-300 dark:text-ink-700">·</span>
               <span>AI分析 <span className="tnum font-semibold text-ink-700 dark:text-ink-200">{aiProgress.completed}</span></span>
               <span className="text-ink-300 dark:text-ink-700">·</span>
-              <span>RSS <span className="tnum">{stats.sources.rss}</span></span>
+              <span>微信 <span className="tnum">{stats.wechatTotal || 0}</span></span>
               <span className="text-ink-300 dark:text-ink-700">·</span>
-              <span>FR <span className="tnum">{stats.sources.fr}</span></span>
-              <span className="text-ink-300 dark:text-ink-700">·</span>
-              <span>Web <span className="tnum">{stats.sources.web}</span></span>
+              <span>FDA <span className="tnum">{(stats.total || 0) - (stats.wechatTotal || 0)}</span></span>
             </div>
           </div>
         </header>
-
-        {/* AI 处理进度条 — 始终显示 */}
-        <section className="mb-4">
-          <AiProgressBar progress={aiProgress} />
-        </section>
 
         {/* 筛选条 */}
         <section className="mb-5">

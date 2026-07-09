@@ -169,11 +169,17 @@ function main() {
     }
 
     const event = wechatArticleToEvent(article);
-    eventsData.items.unshift(event);  // 新文章插入最前面
+    eventsData.items.push(event);  // 先追加
     existingUrls.add(article.link);
-    urlToIdx.set(article.link, 0);
     addedCount++;
   }
+
+  // 全部合并后按发布时间倒序重排（新文章在最前）
+  eventsData.items.sort((a, b) => {
+    const ta = new Date(a.publishedAt || 0).getTime();
+    const tb = new Date(b.publishedAt || 0).getTime();
+    return tb - ta;
+  });
 
   // 更新统计
   eventsData.stats = {
