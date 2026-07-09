@@ -1,0 +1,65 @@
+name: 微信公众号同步
+
+on:
+  schedule:
+    # 每 30 分钟 (UTC)
+    # UTC 16:00 = 北京 0:00 → 全量兜底（昨天）
+    # UTC 16:30~次日15:30 = 北京 0:30~23:30 → 增量（过去31分钟）
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  wechat-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 安装根目录依赖
+        run: npm install --no-save 2>&1 | tail -3 || true
+
+      # ===== 阶段 1：智能采集（自动全量/增量）=====
+      - name: 微信公众号智能采集（v4.0）
+        env:
+          WX_EXPORTER_HOST: '47.107.133.169'
+          WX_EXPORTER_PORT: '3443'
+          WX_EXPORTER_PROTOCOL: 'https'
+          WX_AUTH_KEY: ${{ secrets.WECHAT_AUTH_KEY }}
+          CONTENT_CONCURRENCY: '3'
+          CONTENT_TIMEOUT_MS: '30000'
+          CONTENT_MAX_CHARS: '30000'
+          OUTPUT_FILE: 'regulatory-hot/public/data/wechat-articles.json'
+          WX_STATE_FILE: 'regulatory-hot/public/data/.wechat-state.json'
+        run: node scripts/collect_wechat_smart.cjs
+
+      # ===== 阶段 2：合并微信文章到 events.json =====
+      - name: 合并微信文章到 events.json
+        run: node scripts/merge_wechat.cjs
+
+      # ===== 阶段 3：AI 分析新增条目 =====
+      - name: AI 分析新增条目
+        env:
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
+          SILICONFLOW_MODEL: 'Qwen/Qwen2.5-72B-Instruct'
+          AI_CONCURRENCY: '12'
+        run: node scripts/analyze.cjs --limit=50
+
+      # ===== 阶段 4：提交 =====
+      - name: 提交更新
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main 2>/dev/null || true
+          git add regulatory-hot/public/data/
+          git diff --staged --quiet || git commit -m "📱 微信同步 [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push

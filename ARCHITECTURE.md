@@ -74,13 +74,25 @@
 | IMDRF | 国际 | P2 | RSS |
 | PIC/S | 国际 | P2 | RSS |
 | ISO | 国际 | P2 | RSS |
-
-### 微信公众号（已实现 v3.0）
+### 微信公众号（已实现 v4.0 智能全量+增量）
 | 信源 | 说明 | 采集方式 | 部署位置 |
 |------|------|---------|---------|
-| 微信公众号 (10 P0) | 医药监管相关公众号 | wechat-article-exporter Docker（v3.0: 直连 3443） | 阿里云 47.107.133.169:3443 |
+| 微信公众号 (10 P0) | 医药监管相关公众号 | wechat-article-exporter Docker（直连 3443）+ **v4.0 智能采集** | 阿里云 47.107.133.169:3443 |
 
-**微信采集架构 v3.1**（2026-07-08 更新）：
+**微信采集架构 v4.0**（2026-07-09 更新）：
+```
+GitHub Actions: wechat-sync.yml (每 30 分钟)
+  ├─ 每日 0:00 (北京)  → 全量兜底：拉昨天一整天的文章 (20篇/号)
+  └─ 每日 0:30~23:30     → 增量模式：只抓过去31分钟新文章 (5篇/号)
+  
+核心脚本: scripts/collect_wechat_smart.cjs
+  · 运行时自动检测北京时间 → 判断全量还是增量模式
+  · 增量: ID 比对去重，命中缓存即停，单次 ~15s
+  · 全量: 时间窗口过滤昨天全天，拉到 20 篇/号
+  · 延迟：≤ 30 分钟（增量）+ 每天0点全量兜底
+```
+
+**微信采集架构 v3.1**（保留，collect_wechat_v2.cjs，不再自动运行）：
 ```
 阿里云 Docker: wechat-article-exporter (端口 3443, HTTPS)
   → /api/public/v1/authkey              → 探活 / 验证 auth-key
@@ -125,7 +137,8 @@ GitHub Actions（直连 3443，无 SSH 跳板）
 ```
 监管信息采集监控平台/
 ├── .github/workflows/
-│   └── collect-analyze.yml      # GitHub Actions 定时调度
+│   ├── collect-analyze.yml      # FDA 采集 + AI 分析（每 2h）
+│   └── wechat-sync.yml          # 微信公众号智能同步（每 30min）
 ├── regulatory-hot/              # Next.js 15 前端项目
 │   ├── app/
 │   │   ├── page.tsx             # 首页（精选）
@@ -155,7 +168,9 @@ GitHub Actions（直连 3443，无 SSH 跳板）
 ├── scripts/
 │   ├── analyze.cjs              # AI 一步分析脚本 v2.2（统一 Gateway）
 │   ├── collect_fda.cjs          # FDA 采集入口
-│   ├── collect_wechat_v2.cjs    # 微信公众号采集 v2.0（wechat-article-exporter）
+│   ├── collect_wechat_v2.cjs    # 微信公众号采集 v3.1（保留，不再自动运行）
+│   ├── collect_wechat_smart.cjs  # 微信公众号采集 v4.0（智能全量+增量）
+│   ├── collect_wechat_delta.cjs  # 微信公众号采集 v4.0-delta（阿里云方案，未启用）
 │   ├── merge_wechat.cjs         # 微信文章合并到 events.json
 │   └── check_cookie.cjs         # Cookie 过期检查 & 通知
 ├── src/
@@ -212,7 +227,23 @@ interface RegulatoryEvent {
 
 ## 六、定时调度
 
-### GitHub Actions（主要）
+### GitHub Actions: FDA 采集（独立）
+- **工作流**: `.github/workflows/collect-analyze.yml`
+- **触发**: `cron: 0 */2 * * *`（每 2 小时）
+- **北京时间**: 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00, 00:00, 02:00, 04:00, 06:00
+- **流程**: 检出代码 → npm ci → 采集FDA (RSS+FR+Web) → AI分析 → commit+push
+- **超时**: 30 分钟
+
+### GitHub Actions: 微信公众号同步（独立）
+- **工作流**: `.github/workflows/wechat-sync.yml`
+- **触发**: `cron: */30 * * * *`（每 30 分钟）
+- **脚本**: `scripts/collect_wechat_smart.cjs`（v4.0 智能模式）
+- **流程**: 
+  - 北京时间 0:00 → 全量兜底（昨天全天，20篇/号）
+  - 北京时间 0:30~23:30 → 增量（过去31分钟，5篇/号）
+  - → merge到events.json → AI分析 → commit+push
+- **延迟**: ≤ 30 分钟
+- **超时**: 15 分钟
 - **工作流文件**: `.github/workflows/collect-analyze.yml`
 - **触发**: `cron: 0 */2 * * *`（每2小时）
 - **北京时间**: 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00, 00:00, 02:00, 04:00, 06:00
@@ -307,5 +338,5 @@ interface RegulatoryEvent {
 
 ---
 
-> **最后更新**: 2026-07-08 11:35 CST（v3.1 微信采集：端点切到 /api/public/v1/* 对齐官方文档）  
+> **最后更新**: 2026-07-09 09:07 CST（v4.0 微信智能采集：GitHub Actions 每30分钟 全量+增量，FDA/微信 workflow 拆分）  
 > **下次维护**: 添加新信源时更新本文档
