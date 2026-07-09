@@ -1,0 +1,1196 @@
+{
+  "_comment": "公众号监控列表 —— 增加公众号只需在此文件添加记录，watcher 自动从 mp_fakeid_cache.json 获取 fakeid",
+  "_last_updated": "2026-07-09",
+  "accounts": [
+    {
+      "name": "中国药闻",
+      "category": "regulation",
+      "level": "T1",
+      "country": "CN",
+      "desc": "国家药监局官方"
+    },
+    {
+      "name": "中国药审",
+      "category": "approval",
+      "level": "T1",
+      "country": "CN",
+      "desc": "CDE 药品审评中心"
+    },
+    {
+      "name": "国家医保局",
+      "category": "regulation",
+      "level": "T1",
+      "country": "CN",
+      "desc": "医保政策"
+    },
+    {
+      "name": "蒲公英",
+      "category": "insight",
+      "level": "T2",
+      "country": "CN",
+      "desc": "制药技术社区"
+    },
+    {
+      "name": "医药魔方",
+      "category": "insight",
+      "level": "T2",
+      "country": "CN",
+      "desc": "医药数据/资讯"
+    },
+    {
+      "name": "赛柏蓝",
+      "category": "insight",
+      "level": "T2",
+      "country": "CN",
+      "desc": "医药行业资讯"
+    },
+    {
+      "name": "识林",
+      "category": "regulation",
+      "level": "T2",
+      "country": "CN",
+      "desc": "法规知识平台"
+    },
+    {
+      "name": "医药经济报",
+      "category": "insight",
+      "level": "T2",
+      "country": "CN",
+      "desc": "医药经济/政策"
+    },
+    {
+      "name": "健识局",
+      "category": "insight",
+      "level": "T2",
+      "country": "CN",
+      "desc": "医药政策解读"
+    },
+    {
+      "name": "E药经理人",
+      "category": "insight",
+      "level": "T2",
+      "country": "CN",
+      "desc": "医药产业深度"
+    },
+    {
+      "name": "国家药监局",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家药监局)"
+    },
+    {
+      "name": "中国医药信息网",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家药监局)"
+    },
+    {
+      "name": "中国药检",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家药监局)"
+    },
+    {
+      "name": "中国医疗器械信息网",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家药监局)"
+    },
+    {
+      "name": "中国医药信息查询平台",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家药监局)"
+    },
+    {
+      "name": "国家药典委员会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家药监局)"
+    },
+    {
+      "name": "内蒙古药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药监局)"
+    },
+    {
+      "name": "北京药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药监局)"
+    },
+    {
+      "name": "安徽药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药监局)"
+    },
+    {
+      "name": "湖北药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药监局)"
+    },
+    {
+      "name": "成都市场监管",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药监局)"
+    },
+    {
+      "name": "浙江药闻",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药监局)"
+    },
+    {
+      "name": "山东药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "西藏药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "中国食品药品监管杂志",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "江苏药品监管",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "山西药品监管",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "四川药品监管",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "广东药监",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品监管)"
+    },
+    {
+      "name": "器械之家",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "医疗器械经销商联盟",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "医疗器械",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "赛柏蓝器械",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "中国医疗器械行业协会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "中国医疗器械",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "中国医疗器械信息",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "医疗器械创新网",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "CMEF中国国际医疗器械博览会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗器械)"
+    },
+    {
+      "name": "吉林药品审评",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品审评)"
+    },
+    {
+      "name": "上海药品审评核查中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品审评)"
+    },
+    {
+      "name": "江苏省药监局审核查验中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品审评)"
+    },
+    {
+      "name": "江苏省药监局审评中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品审评)"
+    },
+    {
+      "name": "山东省食品药品审评查验中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品审评)"
+    },
+    {
+      "name": "广东药品审评认证",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品审评)"
+    },
+    {
+      "name": "药评中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药审中心)"
+    },
+    {
+      "name": "天津药审",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药审中心)"
+    },
+    {
+      "name": "陕西药审中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药审中心)"
+    },
+    {
+      "name": "药智数据",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药审中心)"
+    },
+    {
+      "name": "河北省医疗保障局",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "山西医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "大连市医保局",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "抚顺医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "海淀医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "我的医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "大庆医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "沈阳智慧医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "深圳医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "东城医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医保)"
+    },
+    {
+      "name": "北京医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家医保)"
+    },
+    {
+      "name": "中国医疗保障",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家医保)"
+    },
+    {
+      "name": "医保码",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家医保)"
+    },
+    {
+      "name": "贵州医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家医保)"
+    },
+    {
+      "name": "中国医保",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 国家医保)"
+    },
+    {
+      "name": "厦门医疗保障",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗保障)"
+    },
+    {
+      "name": "江西医疗保障",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗保障)"
+    },
+    {
+      "name": "内蒙古医疗保障",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗保障)"
+    },
+    {
+      "name": "重庆市医疗保障局",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗保障)"
+    },
+    {
+      "name": "湖北医疗保障",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医疗保障)"
+    },
+    {
+      "name": "医药筹",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "中国医药报",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "医药人那些事",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "医药经济人",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "医药代表",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "医药观澜",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "医药健闻",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药)"
+    },
+    {
+      "name": "同仁堂制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "联邦制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "齐鲁制药集团",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "步長制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "翰森制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "华森制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "恒瑞医药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "罗氏制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "CPHI制药在线",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 制药)"
+    },
+    {
+      "name": "鲁南制药集团",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企)"
+    },
+    {
+      "name": "药明康德",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企)"
+    },
+    {
+      "name": "云南白药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企)"
+    },
+    {
+      "name": "华纳大药厂",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企动态)"
+    },
+    {
+      "name": "李氏大药厂",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企动态)"
+    },
+    {
+      "name": "广药白云山",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企动态)"
+    },
+    {
+      "name": "药企技术交流联盟",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企动态)"
+    },
+    {
+      "name": "华东医药商业公司",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企动态)"
+    },
+    {
+      "name": "上药控股微人才",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药企动态)"
+    },
+    {
+      "name": "药创新",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "中国医药创新促进会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "创新药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "小豪只投创新药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "药渡",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "动脉新医药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "创新药时代",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "广东省生物医药创新技术协会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "医麦创新药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 创新药)"
+    },
+    {
+      "name": "印度药孟加拉进口仿制药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "新药及仿制药注册",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "盈德健康IndianMed",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "药渡仿制",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "全球进口药新药仿制药大全",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "仿制药立项",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "仿制药质量及疗效一致性评价",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "仿制药一致性评价",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 仿制药)"
+    },
+    {
+      "name": "生物药知识云享",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "生物药资讯",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "生物药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "生物药大时代",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "Armstrong生物药资讯",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "生物药笔记",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "生物药匠",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "生物药小编",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 生物药)"
+    },
+    {
+      "name": "中草药知识大全",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "中国中药杂志",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "中药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "中国中医",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "中国中医药报官方号",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "中草药知识汇总",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "中草药大全",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "广东省新兴中药学校",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "国际中医中药杂志",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 中药)"
+    },
+    {
+      "name": "化药",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "化药之声",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "青岛农业大学化学与药学院",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "郑工药化",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "药化君",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "化药圈",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "药源网",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 化药)"
+    },
+    {
+      "name": "优苗健康",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 疫苗)"
+    },
+    {
+      "name": "上海健康云",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 疫苗)"
+    },
+    {
+      "name": "基因治疗",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "细胞与基因治疗领域",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "细胞基因治疗前沿",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "细胞基因疗法",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "基因治疗圈",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "细胞治疗前沿",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "XBlab I 基因与细胞治疗",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "广州罕见病基因治疗联盟",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 基因治疗)"
+    },
+    {
+      "name": "深圳市细胞治疗技术协会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 细胞治疗)"
+    },
+    {
+      "name": "细胞治疗",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 细胞治疗)"
+    },
+    {
+      "name": "上海细胞治疗工程技术研究中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 细胞治疗)"
+    },
+    {
+      "name": "齐鲁细胞治疗",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 细胞治疗)"
+    },
+    {
+      "name": "免疫细胞治疗中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 细胞治疗)"
+    },
+    {
+      "name": "医学影像设备",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 影像设备)"
+    },
+    {
+      "name": "湖南医学影像设备",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 影像设备)"
+    },
+    {
+      "name": "医学影像设备配件",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 影像设备)"
+    },
+    {
+      "name": "西安云影医学影像诊断中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 影像设备)"
+    },
+    {
+      "name": "高医医用耗材部",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 高值耗材)"
+    },
+    {
+      "name": "医用高分子制品分会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 高值耗材)"
+    },
+    {
+      "name": "GMP行业药文",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: GMP)"
+    },
+    {
+      "name": "允咨GMP制药技术",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: GMP)"
+    },
+    {
+      "name": "药械GSP学习",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: GSP)"
+    },
+    {
+      "name": "GSP药说",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: GSP)"
+    },
+    {
+      "name": "中日医院GCP中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: GCP)"
+    },
+    {
+      "name": "晓飞检健康",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 飞行检查)"
+    },
+    {
+      "name": "辽宁药品监督局",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品召回)"
+    },
+    {
+      "name": "全国药品交易会",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品召回)"
+    },
+    {
+      "name": "丁香园用药指南",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品召回)"
+    },
+    {
+      "name": "临床用药评价",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 药品召回)"
+    },
+    {
+      "name": "医药经济info",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药经济)"
+    },
+    {
+      "name": "东方医药经济技术咨询",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药经济)"
+    },
+    {
+      "name": "广州医药经济报出版有限公司",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药经济)"
+    },
+    {
+      "name": "省药品信息宣传和发展服务中心",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药经济)"
+    },
+    {
+      "name": "ABC健康助手",
+      "category": "insight",
+      "level": "T3",
+      "country": "CN",
+      "desc": "自动发现 (关键词: 医药经济)"
+    }
+  ]
+}
