@@ -15,20 +15,21 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          submodules: false
 
       - name: 安装 Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: 安装根目录依赖
-        run: npm install --no-save 2>&1 | tail -3 || true
+      - name: 安装 Prisma 依赖 (regulatory-hot)
+        working-directory: regulatory-hot
+        run: |
+          npm install 2>&1 | tail -3
+          npx prisma generate 2>&1 | tail -3
 
-      # ===== 阶段 1：git pull 同步 watcher 推送的数据 =====
-      - name: 同步远程数据
-        run: git pull --rebase origin main 2>/dev/null || true
-
-      # ===== 阶段 2：AI 分析新增条目 =====
+      # ===== AI 分析新增条目 =====
       - name: AI 分析新增条目
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
@@ -37,12 +38,14 @@ jobs:
           AI_CONCURRENCY: '12'
         run: node scripts/analyze_v3.cjs --limit=100
 
-      # ===== 阶段 3：提交 =====
+      # ===== 提交 =====
       - name: 提交更新
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash 2>/dev/null || true
           git pull --rebase origin main 2>/dev/null || true
+          git stash pop 2>/dev/null || true
           git add regulatory-hot/public/data/ regulatory-hot/regulatory.db
           git diff --staged --quiet || git commit -m "🤖 AI分析 [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
           git push
