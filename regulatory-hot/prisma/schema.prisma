@@ -1,0 +1,152 @@
+// Prisma Schema — 监管信息采集监控平台
+// Database: SQLite
+// Generated: 2026-07-09
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============================================================
+// 主表：监管事件
+// ============================================================
+model Event {
+  id               String  @id
+  rawItemId        String
+
+  // 标题 — 三语体系
+  titleOriginal    String
+  titleCn          String  @default("")
+  titleLang        String  // zh | en | ja | ...
+
+  // 摘要
+  summaryOriginal  String  @default("")
+  summaryCn        String  @default("")
+
+  // 正文 — 差异化存储
+  contentOriginal  String?
+  contentCn        String?
+  contentHint      String?
+  contentType      String  @default("text")
+
+  // 链接
+  url              String  @unique
+  permalink        String
+
+  // 信源
+  sourceId         String
+  sourceName       String
+  sourceLevel      String   // T1 | T2
+  sourceCountry    String   @default("")
+  sourceFeed       String   @default("")
+  sourceDesc       String   @default("")
+
+  // 分类
+  category         String   // regulation | approval | safety | insight
+  subCategory      String   @default("[]")  // JSON array
+  tags             String   @default("[]")  // JSON array
+  affectedRegions  String   @default("[]")  // JSON array
+
+  // 评分
+  scores           String   @default("{}")  // JSON object
+  finalScore       Float    @default(0)
+  importance       Int      @default(3)
+
+  // AI
+  aiStatus         String   @default("pending") // pending | analyzed | skipped
+  aiModel          String   @default("")
+  aiTranslateModel String   @default("")
+  aiReason         String   @default("")
+  aiCost           Float    @default(0)
+  aiAnalyzedAt     String?
+
+  // 状态
+  selected         Int      @default(0)
+  isLead           Int      @default(0)
+
+  // 时间
+  publishedAt      String
+  crawledAt        String
+  createdAt        String   @default("") @map("created_at")
+  updatedAt        String   @default("") @map("updated_at")
+
+  // 微信特有
+  isSocial         Int      @default(0)
+  readCount        Int      @default(0)
+  likeCount        Int      @default(0)
+  coverUrl         String   @default("")
+
+  // 聚类（后期）
+  clusterId        String?
+  clusterSize      Int      @default(0)
+
+  @@index([sourceId])
+  @@index([publishedAt])
+  @@index([category])
+  @@index([aiStatus])
+  @@index([sourceLevel])
+  @@map("events")
+}
+
+// ============================================================
+// 信源配置
+// ============================================================
+model Source {
+  id        String  @id
+  name      String
+  nameEn    String  @default("")
+  type      String  // agency | wechat | org | media
+  country   String  @default("")
+  region    String  @default("")
+  level     String  @default("T2")
+  enabled   Int     @default(1)
+  endpoints String  @default("[]") // JSON
+  config    String  @default("{}") // JSON
+  createdAt String  @default("") @map("created_at")
+  updatedAt String  @default("") @map("updated_at")
+
+  @@map("sources")
+}
+
+// ============================================================
+// 采集日志
+// ============================================================
+model CrawlLog {
+  id         Int     @id @default(autoincrement())
+  sourceId   String  @map("source_id")
+  startedAt  String  @map("started_at")
+  finishedAt String? @map("finished_at")
+  status     String  @default("running") // success | failed | partial
+  itemsTotal Int     @default(0) @map("items_total")
+  itemsNew   Int     @default(0) @map("items_new")
+  itemsDup   Int     @default(0) @map("items_dup")
+  errorMsg   String? @map("error_msg")
+  durationMs Int?    @map("duration_ms")
+  createdAt  String  @default("") @map("created_at")
+
+  @@index([sourceId])
+  @@map("crawl_logs")
+}
+
+// ============================================================
+// AI 分析记录
+// ============================================================
+model AiAnalysis {
+  id           Int     @id @default(autoincrement())
+  eventId      String  @map("event_id")
+  model        String
+  task         String  // translate_title | summarize | score | translate_content
+  inputTokens  Int     @default(0) @map("input_tokens")
+  outputTokens Int     @default(0) @map("output_tokens")
+  cost         Float   @default(0)
+  durationMs   Int?    @map("duration_ms")
+  status       String  @default("success") // success | failed
+  errorMsg     String? @map("error_msg")
+  createdAt    String  @default("") @map("created_at")
+
+  @@index([eventId])
+  @@map("ai_analyses")
+}

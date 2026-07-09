@@ -21,17 +21,6 @@ interface Props {
 
 /**
  * AIHOT 风格详情页核心组件
- * 布局：
- *   - 面包屑导航
- *   - 中文标题 + 时间/时效信息
- *   - AI 中文摘要区块
- *   - 正文（默认中文翻译，右上角切换原文按钮）
- *   - AI 推荐理由
- *   - 五维评分详情
- *   - 标签
- *   - 操作按钮（阅读原文、分享）
- *   - 上一条/下一条导航
- *   - 相关推荐
  */
 export function DetailView({ event, prev, next, related, catLabel }: Props) {
   const [showOriginal, setShowOriginal] = useState(false);
@@ -41,6 +30,9 @@ export function DetailView({ event, prev, next, related, catLabel }: Props) {
   const summaryDisplay = event.aiSummaryCn || event.summary || '';
   const hasTranslation = !!event.contentCn;
   const hasOriginal = !!event.contentOriginal;
+
+  // SPEC-H: 微信公众号来源不显示正文，改为跳转提示
+  const isWechatSource = event._source === 'wechat' || (event.sourceId || '').startsWith('wechat-');
 
   const displayContent = showOriginal
     ? (event.contentOriginal || '')
@@ -144,8 +136,30 @@ export function DetailView({ event, prev, next, related, catLabel }: Props) {
           )}
         </section>
 
-        {/* 正文区块 — 中文翻译 + 中英切换 */}
-        {displayContent && (
+        {/* 正文区块 */}
+        {/* SPEC-H: 微信公众号来源隐藏正文，显示跳转提示 */}
+        {isWechatSource ? (
+          <section className="border-t border-ink-200/60 px-6 py-5 sm:px-8 dark:border-ink-800/40">
+            <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-5 text-center dark:border-blue-800 dark:bg-blue-950/20">
+              <div className="mb-2 text-2xl">📱</div>
+              <h3 className="mb-1 text-sm font-semibold text-blue-800 dark:text-blue-200">
+                微信公众号来源
+              </h3>
+              <p className="mb-4 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
+                本文来自微信公众号「{event.sourceName || '未知'}」，请点击下方按钮查看原文。
+              </p>
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+              >
+                <ExternalIcon />
+                <span>阅读原文</span>
+              </a>
+            </div>
+          </section>
+        ) : displayContent ? (
           <section className="border-t border-ink-200/60 px-6 py-5 sm:px-8 dark:border-ink-800/40">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-2xs font-semibold uppercase tracking-widest text-ink-400 dark:text-ink-500">
@@ -185,7 +199,7 @@ export function DetailView({ event, prev, next, related, catLabel }: Props) {
               </p>
             )}
           </section>
-        )}
+        ) : null}
 
         {/* 推荐理由 */}
         {event.aiReason && (

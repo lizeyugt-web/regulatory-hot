@@ -1,0 +1,8 @@
+{
+  "content_len": 511,
+  "reasoning_len": 0,
+  "content_preview": "{\n  \"titleCn\": \"零运营负担，享受O2O即时零售红利\",\n  \"aiSummaryCn\": \"该文章来自行业媒体赛柏蓝，主要探讨了如何通过O2O（Online to Offline）即时零售模式减少运营负担并享受市场红利。文章未提及具体的时间或事件核心，但强调了在当前市场环境下，利用数字技术优化零售流程，对于医药企业尤其是零售药店具有重要意义。虽然该信息不是来自FDA或EMA等官方监管机构，但反映了医药零售行业的一个重要趋势，即通过技术手段提升效率和服务质量。合规要点包括确保在采用新技术时遵守当地的数据保护和隐私法规，以及确保药品销售符合监管要求。\",\n  \"aiReason\": \"中国药企和监管从业者应关注此信息，因为它反映了医药零售行业利用技术提升效率的趋势，有助于了解市场动态和未来发展方向。\",\n  \"scores\": {\n    \"sourceAuthority\": 60,\n    \"impactScope\": 75,\n    \"complianceUrgency\": 50,\n    \"industryAttention\": 70,\n    \"timeliness",
+  "reasoning_preview": "",
+  "full_content": "{\n  \"titleCn\": \"零运营负担，享受O2O即时零售红利\",\n  \"aiSummaryCn\": \"该文章来自行业媒体赛柏蓝，主要探讨了如何通过O2O（Online to Offline）即时零售模式减少运营负担并享受市场红利。文章未提及具体的时间或事件核心，但强调了在当前市场环境下，利用数字技术优化零售流程，对于医药企业尤其是零售药店具有重要意义。虽然该信息不是来自FDA或EMA等官方监管机构，但反映了医药零售行业的一个重要趋势，即通过技术手段提升效率和服务质量。合规要点包括确保在采用新技术时遵守当地的数据保护和隐私法规，以及确保药品销售符合监管要求。\",\n  \"aiReason\": \"中国药企和监管从业者应关注此信息，因为它反映了医药零售行业利用技术提升效率的趋势，有助于了解市场动态和未来发展方向。\",\n  \"scores\": {\n    \"sourceAuthority\": 60,\n    \"impactScope\": 75,\n    \"complianceUrgency\": 50,\n    \"industryAttention\": 70,\n    \"timeliness\": 65\n  }\n}",
+  "full_reasoning": ""
+}

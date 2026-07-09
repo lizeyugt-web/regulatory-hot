@@ -460,12 +460,33 @@ async function main() {
   state.accounts = { ...state.accounts, ...accountStates };
   saveState(state);
 
-  // 7. 合并写入
+  // 7. 合并写入 JSON（备份）
   if (allNewArticles.length > 0) {
     const merged = mergeOutput(allNewArticles);
     console.log(`[wechat] wechat-articles.json: +${allNewArticles.length}, 累计 ${merged.length}`);
     ensureDir(OUTPUT);
     fs.writeFileSync(OUTPUT, JSON.stringify(merged, null, 2));
+  }
+
+  // 8. 写入数据库
+  if (allNewArticles.length > 0) {
+    try {
+      const { wechatToDb, insertEvents, logCrawl, disconnectPrisma } = require('./db_writer.cjs');
+      const dbEvents = allNewArticles.map(a => wechatToDb(a));
+      const dbResult = await insertEvents(dbEvents);
+      console.log(`[wechat] DB: +${dbResult.inserted} 条, 跳过 ${dbResult.skipped} 条`);
+      await logCrawl('wechat', {
+        startedAt: new Date(startTime).toISOString(),
+        status: 'success',
+        total: allNewArticles.length,
+        inserted: dbResult.inserted,
+        skipped: dbResult.skipped,
+        durationMs: Date.now() - startTime,
+      });
+      await disconnectPrisma();
+    } catch (e) {
+      console.log(`[wechat] DB写入失败: ${e.message}`);
+    }
   }
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);

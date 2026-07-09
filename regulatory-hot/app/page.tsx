@@ -3,9 +3,9 @@ import { EventCard } from '@/components/event/EventCard';
 import { FilterToolbar } from '@/components/event/FilterToolbar';
 import { HotTopicsPanel } from '@/components/event/HotTopicsPanel';
 import { CategoryNavPanel } from '@/components/event/CategoryNavPanel';
-import { AiProgressBar } from '@/components/event/AiProgressBar';
+import { CollapsibleGroup } from '@/components/event/CollapsibleGroup';
 import { CATEGORIES, SUB_CATEGORIES, type CategoryId } from '@/lib/config';
-import { getEvents, getStats, getAiProgress } from '@/lib/events-data';
+import { getEvents, getStats } from '@/lib/events-data';
 import type { RegulatoryEvent } from '@/lib/types';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
@@ -17,7 +17,7 @@ interface PageProps {
   searchParams?: { category?: string; tag?: string | string[]; tagMatch?: string; selected?: string; q?: string };
 }
 
-export default function HomePage({ searchParams }: PageProps) {
+export default async function HomePage({ searchParams }: PageProps) {
   const activeCat: CategoryId | 'all' =
     (searchParams?.category as CategoryId | undefined) ?? 'all';
   const activeTags = toStringArray(searchParams?.tag);
@@ -25,9 +25,8 @@ export default function HomePage({ searchParams }: PageProps) {
   const selectedOnly = searchParams?.selected === '1';
   const q = searchParams?.q?.toLowerCase();
 
-  const allEvents = getEvents();
-  const stats = getStats();
-  const aiProgress = getAiProgress();
+  const allEvents = await getEvents();
+  const stats = await getStats();
   const tagStats = computeTagStats(allEvents);
 
   // 首页只显示精选，限制 30 条
@@ -87,11 +86,6 @@ export default function HomePage({ searchParams }: PageProps) {
           </div>
         </header>
 
-        {/* AI 处理进度条 */}
-        <section className="mb-4">
-          <AiProgressBar progress={aiProgress} />
-        </section>
-
         {/* 筛选条 */}
         <section className="mb-5">
           <FilterToolbar basePath="/" tagStats={tagStats} />
@@ -103,23 +97,16 @@ export default function HomePage({ searchParams }: PageProps) {
 
           <div className="space-y-6">
             {groups.map((g) => (
-              <section key={g.dateLabel}>
-                <div className="mb-2 flex items-center gap-3">
-                  <div className="relative z-10 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border-2 border-white bg-brand-500 text-[10px] font-bold text-white shadow-soft dark:border-ink-950 dark:bg-brand-600">
-                    {g.dateLabel.replace('月', '/').replace('日', '')}
-                  </div>
-                  <h2 className="text-sm font-semibold tracking-tight text-ink-900 dark:text-ink-50">
-                    {g.dateLabel}
-                  </h2>
-                  <span className="tnum text-xs text-ink-500 dark:text-ink-400">{g.items.length} 条</span>
-                  <span className="h-px flex-1 bg-ink-200/60 dark:bg-ink-800/60" />
-                </div>
-                <div className="divide-y divide-ink-100 dark:divide-ink-800/60">
-                  {g.items.map((e) => (
-                    <EventCard key={e.id} event={e} variant="default" />
-                  ))}
-                </div>
-              </section>
+              <CollapsibleGroup
+                key={g.dateLabel}
+                dateLabel={g.dateLabel}
+                count={g.items.length}
+                dateCode={g.dateLabel.replace('月', '/').replace('日', '')}
+              >
+                {g.items.map((e) => (
+                  <EventCard key={e.id} event={e} variant="default" />
+                ))}
+              </CollapsibleGroup>
             ))}
           </div>
         </div>

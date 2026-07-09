@@ -43,13 +43,13 @@ jobs:
         run: node scripts/collect_fda.cjs
 
       # ===== AI 分析 FDA 新条目 =====
-      - name: AI 分析新增条目
+      - name: AI 分析新增条目 (v3.0 DB)
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
           SILICONFLOW_MODEL: 'Qwen/Qwen2.5-72B-Instruct'
           AI_CONCURRENCY: '8'
-        run: node scripts/analyze.cjs --limit=80
+        run: node scripts/analyze_v3.cjs --limit=80
 
       # ===== 提交 =====
       - name: 提交更新
@@ -57,6 +57,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
-          git add regulatory-hot/public/data/
+          git add regulatory-hot/public/data/ regulatory-hot/regulatory.db regulatory-hot/prisma/
           git diff --staged --quiet || git commit -m "🤖 FDA采集 [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
           git push

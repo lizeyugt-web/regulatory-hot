@@ -1,5 +1,6 @@
 import { EventCard } from '@/components/event/EventCard';
 import { FilterToolbar } from '@/components/event/FilterToolbar';
+import { CollapsibleGroup } from '@/components/event/CollapsibleGroup';
 import { HotTopicsPanel } from '@/components/event/HotTopicsPanel';
 import { CATEGORIES, SUB_CATEGORIES, type CategoryId } from '@/lib/config';
 import { getEvents, getStats } from '@/lib/events-data';
@@ -15,7 +16,7 @@ interface PageProps {
   searchParams?: { category?: string; tag?: string | string[]; tagMatch?: string; selected?: string; q?: string };
 }
 
-export default function AllPage({ searchParams }: PageProps) {
+export default async function AllPage({ searchParams }: PageProps) {
   const activeCat: CategoryId | 'all' =
     (searchParams?.category as CategoryId | undefined) ?? 'all';
   const activeTags = toStringArray(searchParams?.tag);
@@ -23,8 +24,8 @@ export default function AllPage({ searchParams }: PageProps) {
   const selectedOnly = searchParams?.selected === '1';
   const q = searchParams?.q?.toLowerCase();
 
-  const allEvents = getEvents();
-  const stats = getStats();
+  const allEvents = await getEvents();
+  const stats = await getStats();
   const tagStats = computeTagStats(allEvents);
   const aiProgress = { completed: allEvents.filter(e => e.aiAnalyzedAt).length, total: allEvents.length };
 
@@ -97,23 +98,16 @@ export default function AllPage({ searchParams }: PageProps) {
 
           <div className="space-y-6">
             {groupArr.map(([dateLabel, items]) => (
-              <section key={dateLabel}>
-                <div className="mb-2 flex items-center gap-3">
-                  <div className="relative z-10 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border-2 border-white bg-brand-500 text-[10px] font-bold text-white shadow-soft dark:border-ink-950 dark:bg-brand-600">
-                    {dateLabel.split(' ')[0].replace('月', '/').replace('日', '')}
-                  </div>
-                  <h2 className="text-sm font-semibold tracking-tight text-ink-900 dark:text-ink-50">
-                    {dateLabel}
-                  </h2>
-                  <span className="tnum text-xs text-ink-500 dark:text-ink-400">{items.length} 条</span>
-                  <span className="h-px flex-1 bg-ink-200/60 dark:bg-ink-800/60" />
-                </div>
-                <div className="divide-y divide-ink-100 dark:divide-ink-800/60">
-                  {items.map((e) => (
-                    <EventCard key={e.id} event={e} variant="default" />
-                  ))}
-                </div>
-              </section>
+              <CollapsibleGroup
+                key={dateLabel}
+                dateLabel={dateLabel}
+                count={items.length}
+                dateCode={dateLabel.split(' ')[0].replace('月', '/').replace('日', '')}
+              >
+                {items.map((e) => (
+                  <EventCard key={e.id} event={e} variant="default" />
+                ))}
+              </CollapsibleGroup>
             ))}
           </div>
         </div>

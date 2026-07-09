@@ -41,25 +41,21 @@ jobs:
           WX_STATE_FILE: 'regulatory-hot/public/data/.wechat-state.json'
         run: node scripts/collect_wechat_smart.cjs
 
-      # ===== 阶段 2：合并微信文章到 events.json =====
-      - name: 合并微信文章到 events.json
-        run: node scripts/merge_wechat.cjs
-
-      # ===== 阶段 3：AI 分析新增条目 =====
+      # ===== 阶段 2：AI 分析新增条目 (v3.0 DB) =====
       - name: AI 分析新增条目
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: https://api.siliconflow.cn/v1
           SILICONFLOW_MODEL: 'Qwen/Qwen2.5-72B-Instruct'
           AI_CONCURRENCY: '12'
-        run: node scripts/analyze.cjs --limit=50
+        run: node scripts/analyze_v3.cjs --limit=50
 
-      # ===== 阶段 4：提交 =====
+      # ===== 阶段 3：提交 =====
       - name: 提交更新
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
-          git add regulatory-hot/public/data/
+          git add regulatory-hot/public/data/ regulatory-hot/regulatory.db
           git diff --staged --quiet || git commit -m "📱 微信同步 [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
           git push
