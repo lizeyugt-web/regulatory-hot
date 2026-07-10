@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { EventCard } from '@/components/event/EventCard';
-import { FilterToolbar } from '@/components/event/FilterToolbar';
+import { SmartSearchBar } from '@/components/event/SmartSearchBar';
 import { HotTopicsPanel } from '@/components/event/HotTopicsPanel';
 import { CategoryNavPanel } from '@/components/event/CategoryNavPanel';
 import { CollapsibleGroup } from '@/components/event/CollapsibleGroup';
-import { CATEGORIES, SUB_CATEGORIES, type CategoryId } from '@/lib/config';
+import { CATEGORIES, type CategoryId } from '@/lib/config';
 import { getEvents, getStats } from '@/lib/events-data';
 import type { RegulatoryEvent } from '@/lib/types';
 import { format } from 'date-fns';
@@ -14,20 +14,17 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 interface PageProps {
-  searchParams?: { category?: string; tag?: string | string[]; tagMatch?: string; selected?: string; q?: string };
+  searchParams?: { category?: string; q?: string; mode?: string; range?: string; selected?: string };
 }
 
 export default async function HomePage({ searchParams }: PageProps) {
   const activeCat: CategoryId | 'all' =
     (searchParams?.category as CategoryId | undefined) ?? 'all';
-  const activeTags = toStringArray(searchParams?.tag);
-  const tagMatch: 'any' | 'all' = searchParams?.tagMatch === 'all' ? 'all' : 'any';
-  const selectedOnly = searchParams?.selected === '1';
   const q = searchParams?.q?.toLowerCase();
+  const selectedOnly = searchParams?.selected === '1';
 
   const allEvents = await getEvents();
   const stats = await getStats();
-  const tagStats = computeTagStats(allEvents);
 
   // 首页只显示精选，限制 30 条
   let events = allEvents.filter((e) => e.selected);
@@ -35,22 +32,35 @@ export default async function HomePage({ searchParams }: PageProps) {
   if (activeCat !== 'all') {
     events = events.filter((e) => e.category === activeCat);
   }
-  if (activeTags.length > 0) {
-    events = events.filter((e) => matchTags(e, activeTags, tagMatch));
-  }
   if (selectedOnly) {
     events = events.filter((e) => e.selected);
   }
   if (q) {
+    const mode = searchParams?.mode ?? 'full';
     events = events.filter(
-      (e) =>
-        e.title.toLowerCase().includes(q) ||
-        (e.titleEn?.toLowerCase().includes(q) ?? false) ||
-        e.summary.toLowerCase().includes(q) ||
-        (e.aiSummaryCn?.toLowerCase().includes(q) ?? false) ||
-        (e.aiReason?.toLowerCase().includes(q) ?? false) ||
-        (e.contentCn?.toLowerCase().includes(q) ?? false)
+      (e) => {
+        if (mode === 'title') return e.title.toLowerCase().includes(q) || (e.titleEn?.toLowerCase().includes(q) ?? false);
+        if (mode === 'summary') return e.summary.toLowerCase().includes(q) || (e.aiSummaryCn?.toLowerCase().includes(q) ?? false);
+        if (mode === 'source') return (e.sourceName || '').toLowerCase().includes(q);
+        if (mode === 'tag') return (e.tags || []).some(t => t.toLowerCase().includes(q));
+        // full search
+        return e.title.toLowerCase().includes(q) ||
+          (e.titleEn?.toLowerCase().includes(q) ?? false) ||
+          e.summary.toLowerCase().includes(q) ||
+          (e.aiSummaryCn?.toLowerCase().includes(q) ?? false) ||
+          (e.aiReason?.toLowerCase().includes(q) ?? false) ||
+          (e.contentCn?.toLowerCase().includes(q) ?? false);
+      }
     );
+  }
+  // 时间范围过滤
+  if (searchParams?.range) {
+    const rangeDays: Record<string, number> = { '1d': 1, '3d': 3, '7d': 7, '30d': 30 };
+    const days = rangeDays[searchParams.range] || 0;
+    if (days > 0) {
+      const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      events = events.filter((e) => new Date(e.publishedAt) >= cutoff);
+    }
   }
 
   // 限制首页展示数量
@@ -86,9 +96,9 @@ export default async function HomePage({ searchParams }: PageProps) {
           </div>
         </header>
 
-        {/* 筛选条 */}
+        {/* 智能搜索栏 */}
         <section className="mb-5">
-          <FilterToolbar basePath="/" tagStats={tagStats} />
+          <SmartSearchBar basePath="/" />
         </section>
 
         {/* 时间轴主体 */}
@@ -167,28 +177,6 @@ function groupByDay(events: RegulatoryEvent[]) {
     map.get(key)!.push(e);
   }
   return Array.from(map.entries()).map(([dateLabel, items]) => ({ dateLabel, items }));
-}
-
-function toStringArray(v: string | string[] | undefined): string[] {
-  if (!v) return [];
-  return Array.isArray(v) ? v : [v];
-}
-
-function matchTags(e: RegulatoryEvent, tags: string[], mode: 'any' | 'all'): boolean {
-  const eventTags: string[] = e.subCategory ?? [];
-  if (mode === 'all') return tags.every((t) => eventTags.includes(t));
-  return tags.some((t) => eventTags.includes(t));
-}
-
-function computeTagStats(events: RegulatoryEvent[]): Record<string, number> {
-  const map: Record<string, number> = {};
-  for (const t of SUB_CATEGORIES) map[t] = 0;
-  for (const e of events) {
-    for (const t of e.subCategory ?? []) {
-      if (t in map) map[t] += 1;
-    }
-  }
-  return map;
 }
 
 function computeCategoryCounts(events: RegulatoryEvent[]): Record<string, number> {
