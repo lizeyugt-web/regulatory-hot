@@ -7,7 +7,7 @@ import path from 'path';
 
 const DB_PATH = process.env.DATABASE_URL || `file:${path.join(process.cwd(), 'regulatory.db')}`;
 
-const globalForPrisma = globalThis;
+const globalForPrisma = globalThis as unknown as { __prisma?: PrismaClient };
 
 function createPrisma() {
   const adapter = new PrismaLibSql({ url: DB_PATH });
