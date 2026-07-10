@@ -1,6 +1,6 @@
-# 监管信息采集监控平台 (Regulatory Hot) — 项目架构文档 v2.0
+# 监管信息采集监控平台 (Regulatory Hot) — 项目架构文档 v3.0
 
-> **固化日期**: 2026-07-03  
+> **固化日期**: 2026-07-10  
 > **GitHub**: https://github.com/lizeyugt-web/regulatory-hot  
 > **本地路径**: `d:/Claude code 项目/监管信息采集监控平台/`
 
@@ -12,10 +12,10 @@
 
 **核心信息流**：
 ```
-采集 (GitHub Actions 每2小时)
+采集 (本地守护进程 Local Daemon v1.0)
   → AI 一步分析 (DeepSeek-V3.2 标题翻译+摘要+推荐理由+五维评分)
-  → events.json
-  → 前端展示 (Next.js 15)
+  → SQLite (regulatory.db)
+  → 前端展示 (Next.js 14 / React 18)
 ```
 
 ---
@@ -225,34 +225,33 @@ interface RegulatoryEvent {
 
 ---
 
-## 六、定时调度
+## 六、定时调度（v3.0 本地化）
 
-### GitHub Actions: FDA 采集（独立）
-- **工作流**: `.github/workflows/collect-analyze.yml`
-- **触发**: `cron: 0 */2 * * *`（每 2 小时）
-- **北京时间**: 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00, 00:00, 02:00, 04:00, 06:00
-- **流程**: 检出代码 → npm ci → 采集FDA (RSS+FR+Web) → AI分析 → commit+push
-- **超时**: 30 分钟
-
-### GitHub Actions: 微信公众号同步（独立）
-- **工作流**: `.github/workflows/wechat-sync.yml`
-- **触发**: `cron: */30 * * * *`（每 30 分钟）
-- **脚本**: `scripts/collect_wechat_smart.cjs`（v4.0 智能模式）
-- **流程**: 
-  - 北京时间 0:00 → 全量兜底（昨天全天，20篇/号）
-  - 北京时间 0:30~23:30 → 增量（过去31分钟，5篇/号）
-  - → merge到events.json → AI分析 → commit+push
+### 本地守护进程 (Local Daemon v1.0) — 主力
+- **脚本**: `scripts/local_daemon.cjs`
+- **PM2 配置**: `ecosystem.local.config.cjs`
+- **一键启动**: `start_local.cmd`
+- **触发**: 持续运行，每 30 分钟一轮
+- **流程**:
+  ```
+  git pull (拉取 ECS 微信文章)
+    → 微信导入 (wechat → regulatory.db)
+    → FDA 采集 (每 4 轮/2h)
+    → AI 分析 (analyze_v3.cjs, 上限 100 条/轮)
+    → git push
+  ```
 - **延迟**: ≤ 30 分钟
-- **超时**: 15 分钟
-- **工作流文件**: `.github/workflows/collect-analyze.yml`
-- **触发**: `cron: 0 */2 * * *`（每2小时）
-- **北京时间**: 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00, 00:00, 02:00, 04:00, 06:00
-- **流程**: 检出代码 → npm ci → 采集FDA → SSH远程采集微信 → SCP下载 → 合并微信文章 → AI分析 → git commit + push
-- **超时**: 30分钟
 
-### 本地 Windows 定时任务（备用）
-- **脚本**: `auto_collect_analyze.cmd`
-- **安装**: `powershell -ExecutionPolicy Bypass -File schedule_task.ps1`
+### ECS 守护进程 (watcher.cjs v5.0) — 微信采集
+- **部署**: 阿里云 47.107.133.169, PM2 管理
+- **脚本**: `scripts/watcher.cjs`
+- **触发**: 每 30 分钟轮询 wechat-article-exporter (Docker, 端口 3443)
+- **职责**: 拉取 10 个 P0 公众号文章 → 写 wechat-articles.json → git push
+
+### GitHub Actions — 保留作为兜底
+- **FDA 采集**: `.github/workflows/collect-analyze.yml` (每 2h, cron 触发)
+- **微信 AI**: `.github/workflows/wechat-sync.yml` (每 30min)
+- **状态**: 保留但不再作为主路径
 
 ---
 
@@ -338,5 +337,5 @@ interface RegulatoryEvent {
 
 ---
 
-> **最后更新**: 2026-07-09 09:07 CST（v4.0 微信智能采集：GitHub Actions 每30分钟 全量+增量，FDA/微信 workflow 拆分）  
+> **最后更新**: 2026-07-10 09:25 CST（v3.0 本地守护进程架构，GitHub Actions 降级为兜底）  
 > **下次维护**: 添加新信源时更新本文档
