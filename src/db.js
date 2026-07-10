@@ -12,10 +12,11 @@ const SUB = path.join(ROOT, 'regulatory-hot');
 
 function resolveModule(name) {
   const subPath = path.join(SUB, 'node_modules', name);
-  if (fs.existsSync(subPath)) return require(subPath);
   const rootPath = path.join(ROOT, 'node_modules', name);
-  if (fs.existsSync(rootPath)) return require(rootPath);
-  throw new Error(`Cannot find module: ${name} (tried ${subPath} and ${rootPath})`);
+  // try-catch 处理 npm 安装中断留下的半成品目录
+  try { return require(subPath); } catch {}
+  try { return require(rootPath); } catch {}
+  throw new Error(`Cannot find module: ${name} (tried sub and root node_modules)`);
 }
 
 const { PrismaClient } = resolveModule('@prisma/client');
