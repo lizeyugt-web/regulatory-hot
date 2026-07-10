@@ -24,8 +24,8 @@ const CAT_LABELS: Record<string, { name: string; desc: string }> = {
   insight: { name: '行业洞察', desc: '会议活动、政策声明、跨境合作' },
 };
 
-export default function TopicsPage() {
-  const events = getEvents();
+export default async function TopicsPage() {
+  const events = await getEvents();
 
   // 按分类生成主题
   const catMap = new Map<string, RegulatoryEvent[]>();

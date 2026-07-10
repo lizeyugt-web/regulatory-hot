@@ -10,8 +10,8 @@ interface PageProps {
   params: { id: string };
 }
 
-export default function EventDetailPage({ params }: PageProps) {
-  const allEvents = getEvents();
+export default async function EventDetailPage({ params }: PageProps) {
+  const allEvents = await getEvents();
   const idx = allEvents.findIndex((e) => e.id === params.id);
   const event = idx >= 0 ? allEvents[idx] : null;
   if (!event) notFound();

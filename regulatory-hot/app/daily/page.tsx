@@ -11,9 +11,9 @@ import { zhCN } from 'date-fns/locale';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: '监管日报' };
 
-export default function DailyPage() {
-  const allEvents = getEvents();
-  const stats = getStats();
+export default async function DailyPage() {
+  const allEvents = await getEvents();
+  const stats = await getStats();
   const today = new Date();
 
   // 过去 24h 窗口

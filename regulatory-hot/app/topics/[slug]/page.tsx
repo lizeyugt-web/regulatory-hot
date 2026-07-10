@@ -15,8 +15,8 @@ const CAT_LABELS: Record<string, string> = {
   insight: '行业洞察',
 };
 
-export default function TopicDetailPage({ params }: PageProps) {
-  const allEvents = getEvents();
+export default async function TopicDetailPage({ params }: PageProps) {
+  const allEvents = await getEvents();
   const slug = decodeURIComponent(params.slug);
 
   let topicName = slug;
