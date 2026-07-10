@@ -107,6 +107,17 @@ export interface RegulatoryEvent {
   // ===== 聚类详情 =====
   isClusterPrimary?: boolean;        // 是否为聚类的展示主条目
   clusterSourceCount?: number;       // 本聚类的信源数量
+
+  // ===== 内部字段 =====
+  _source?: string;                  // 数据来源标识 (fda/wechat)
+  _readCount?: number;               // 微信阅读数
+  _likeCount?: number;                // 微信点赞数
+  _coverUrl?: string;                // 微信封面图
+  _contentHint?: string;             // 正文提示（如"请阅读原文"）
+  isSocial?: boolean;                // 是否社交媒体来源
+  sourceFeed?: string;               // 信源 RSS Feed ID
+  sourceDesc?: string;               // 信源描述
+  contentType?: string;              // 正文类型 (html/markdown/text)
 }
 
 // ---------------------------------------------------------------------------
