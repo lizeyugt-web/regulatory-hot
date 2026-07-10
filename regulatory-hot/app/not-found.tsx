@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { EventCard } from '@/components/event/EventCard';
 import { getSelectedEvents } from '@/lib/events-data';
 
-export default function NotFound() {
-  const suggestions = getSelectedEvents().slice(0, 4);
+export default async function NotFound() {
+  const suggestions = (await getSelectedEvents()).slice(0, 4);
 
   return (
     <div className="mx-auto max-w-3xl py-10">
