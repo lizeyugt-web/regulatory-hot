@@ -127,6 +127,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                 dateLabel={olderLabel}
                 count={olderTotal}
                 dateCode="•••"
+                startCollapsed
               >
                 {older.map((e) => (
                   <EventCard key={e.id} event={e} variant="default" />

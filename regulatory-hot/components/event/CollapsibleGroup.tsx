@@ -1,40 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Children } from 'react';
 import type { ReactNode } from 'react';
 
 interface CollapsibleGroupProps {
   dateLabel: string;
   count: number;
-  dateCode: string;       // e.g. "7/9"
+  dateCode: string;
   children: ReactNode;
-  /** 当天不可折叠，全部显示 */
+  /** 当天 — 默认展开且不截断 */
   isToday?: boolean;
-  /** 初始显示条数上限（非当天时生效），超出部分折叠 */
+  /** 非当天时初始显示条数上限 */
   maxInitial?: number;
+  /** 默认折叠（用于"更早的记录"） */
+  startCollapsed?: boolean;
 }
 
 export function CollapsibleGroup({
-  dateLabel, count, dateCode, children, isToday = false, maxInitial,
+  dateLabel, count, dateCode, children, isToday = false, maxInitial, startCollapsed = false,
 }: CollapsibleGroupProps) {
-  const [collapsed, setCollapsed] = useState(!isToday);
+  const [collapsed, setCollapsed] = useState(startCollapsed);
   const [showAll, setShowAll] = useState(isToday);
 
+  const childArr = Children.toArray(children);
   const hasMore = !isToday && maxInitial && count > maxInitial;
   const hiddenCount = hasMore ? count - maxInitial : 0;
-
-  // 当天始终展开
-  const effectiveCollapsed = isToday ? false : collapsed;
+  const visibleChildren = showAll || isToday ? childArr : childArr.slice(0, maxInitial);
 
   return (
     <section>
       <button
         type="button"
-        onClick={() => {
-          if (!isToday) setCollapsed(!collapsed);
-        }}
-        className="mb-2 flex w-full items-center gap-3 group"
-        style={{ cursor: isToday ? 'default' : 'pointer' }}
+        onClick={() => setCollapsed(!collapsed)}
+        className="mb-2 flex w-full items-center gap-3 group cursor-pointer"
       >
         <div className={`relative z-10 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border-2 border-white text-[10px] font-bold shadow-soft dark:border-ink-950 ${
           isToday
@@ -48,34 +46,32 @@ export function CollapsibleGroup({
         </h2>
         <span className="tnum text-xs text-ink-500 dark:text-ink-400">{count} 条</span>
         <span className="h-px flex-1 bg-ink-200/60 dark:bg-ink-800/60" />
-        {!isToday && (
-          <svg
-            className={`h-4 w-4 flex-shrink-0 text-ink-400 transition-transform duration-200 ${
-              effectiveCollapsed ? '' : 'rotate-180'
-            }`}
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )}
+        <svg
+          className={`h-4 w-4 flex-shrink-0 text-ink-400 transition-transform duration-200 ${
+            collapsed ? '' : 'rotate-180'
+          }`}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
 
       {/* 内容区 */}
       <div
         className={`overflow-hidden transition-all duration-300 ${
-          effectiveCollapsed ? 'max-h-0 opacity-0' : 'max-h-[9999px] opacity-100'
+          collapsed ? 'max-h-0 opacity-0' : 'max-h-[9999px] opacity-100'
         }`}
       >
         <div className="divide-y divide-ink-100 dark:divide-ink-800/60">
-          {children}
+          {visibleChildren}
         </div>
       </div>
 
-      {/* 显示更多按钮 */}
-      {hasMore && !effectiveCollapsed && !showAll && (
+      {/* 显示更多 */}
+      {hasMore && !collapsed && !showAll && (
         <button
           type="button"
           onClick={() => setShowAll(true)}
