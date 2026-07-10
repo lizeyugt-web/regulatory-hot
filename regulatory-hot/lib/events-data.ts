@@ -5,6 +5,17 @@
 import prisma from './prisma';
 import type { RegulatoryEvent } from './types';
 
+// ============ 类型 ============
+
+export interface AiProgress {
+  total: number;
+  completed: number;
+  pending: number;
+  lastRun?: string;
+  lastDuration?: string;
+  lastCost?: string;
+}
+
 // ============ 核心读取 ============
 
 /** 获取事件列表（支持筛选） */
