@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '/regulatory',
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
