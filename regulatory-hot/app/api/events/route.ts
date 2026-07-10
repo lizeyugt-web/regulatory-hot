@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
        ORDER BY e.publishedAt DESC
        LIMIT ? OFFSET ?`,
       q, limit, offset
-    );
+    ) as any[];
     return NextResponse.json({ items: results, count: results.length });
   }
 
