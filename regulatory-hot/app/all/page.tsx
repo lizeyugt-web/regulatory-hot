@@ -4,7 +4,7 @@ import { CollapsibleGroup } from '@/components/event/CollapsibleGroup';
 import { HotTopicsPanel } from '@/components/event/HotTopicsPanel';
 import { CATEGORIES, type CategoryId } from '@/lib/config';
 import { getEvents, getStats } from '@/lib/events-data';
-import type { RegulatoryEvent } from '@/lib/types';
+import { buildTimeline } from '@/lib/timeline';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 
@@ -58,16 +58,10 @@ export default async function AllPage({ searchParams }: PageProps) {
     }
   }
 
-  // 限制展示数量
-  events = events.slice(0, 50);
+  // 页面不硬截断，交给 CollapsibleGroup 的 maxInitial 控制
+  const { recent, older, olderLabel, olderTotal } = buildTimeline(events);
 
-  const groups = new Map<string, typeof events>();
-  for (const e of events) {
-    const key = format(new Date(e.publishedAt), 'M月d日 EEEE', { locale: zhCN });
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(e);
-  }
-  const groupArr = Array.from(groups.entries());
+  const groupArr = recent.map(g => [g.dateLabel, g] as const);
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_15rem]">
@@ -103,18 +97,34 @@ export default async function AllPage({ searchParams }: PageProps) {
           <div className="absolute left-[22px] top-2 bottom-2 w-px bg-ink-200 dark:bg-ink-800" />
 
           <div className="space-y-6">
-            {groupArr.map(([dateLabel, items]) => (
+            {/* 7天内 */}
+            {groupArr.map(([, g]) => (
               <CollapsibleGroup
-                key={dateLabel}
-                dateLabel={dateLabel}
-                count={items.length}
-                dateCode={dateLabel.split(' ')[0].replace('月', '/').replace('日', '')}
+                key={g.dateLabel}
+                dateLabel={g.dateLabel}
+                count={g.items.length}
+                dateCode={g.dateCode}
+                isToday={g.isToday}
+                maxInitial={g.isToday ? undefined : 10}
               >
-                {items.map((e) => (
+                {g.items.map((e) => (
                   <EventCard key={e.id} event={e} variant="default" />
                 ))}
               </CollapsibleGroup>
             ))}
+
+            {/* 更早的记录 — 默认折叠 */}
+            {older.length > 0 && (
+              <CollapsibleGroup
+                dateLabel={olderLabel}
+                count={olderTotal}
+                dateCode="•••"
+              >
+                {older.map((e) => (
+                  <EventCard key={e.id} event={e} variant="default" />
+                ))}
+              </CollapsibleGroup>
+            )}
           </div>
         </div>
 

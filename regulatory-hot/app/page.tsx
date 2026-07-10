@@ -6,6 +6,7 @@ import { CategoryNavPanel } from '@/components/event/CategoryNavPanel';
 import { CollapsibleGroup } from '@/components/event/CollapsibleGroup';
 import { CATEGORIES, type CategoryId } from '@/lib/config';
 import { getEvents, getStats } from '@/lib/events-data';
+import { buildTimeline } from '@/lib/timeline';
 import type { RegulatoryEvent } from '@/lib/types';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
@@ -63,12 +64,10 @@ export default async function HomePage({ searchParams }: PageProps) {
     }
   }
 
-  // 限制首页展示数量
-  events = events.slice(0, 30);
+  // 页面不硬截断，交给 CollapsibleGroup 的 maxInitial 控制
+  const { recent, older, olderLabel, olderTotal } = buildTimeline(events);
 
-  const groups = groupByDay(events);
-
-  const today = format(new Date(), 'M月d日 EEEE', { locale: zhCN });
+  const todayStr = format(new Date(), 'M月d日', { locale: zhCN });
   const categoryLabel = CATEGORIES.find((c) => c.id === activeCat)?.label;
   const catCounts = computeCategoryCounts(allEvents);
 
@@ -83,7 +82,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                 {activeCat === 'all' ? '精选' : categoryLabel}
               </h1>
               <span className="text-xs text-ink-500 dark:text-ink-400">
-                {today} · FDA 监管情报自动聚合
+                {todayStr} · 监管情报自动聚合
               </span>
             </div>
             <div className="flex items-center gap-3 text-xs text-ink-500 dark:text-ink-400">
@@ -106,18 +105,34 @@ export default async function HomePage({ searchParams }: PageProps) {
           <div className="absolute left-[22px] top-2 bottom-2 w-px bg-ink-200 dark:bg-ink-800" />
 
           <div className="space-y-6">
-            {groups.map((g) => (
+            {/* 7天内 */}
+            {recent.map((g) => (
               <CollapsibleGroup
                 key={g.dateLabel}
                 dateLabel={g.dateLabel}
                 count={g.items.length}
-                dateCode={g.dateLabel.replace('月', '/').replace('日', '')}
+                dateCode={g.dateCode}
+                isToday={g.isToday}
+                maxInitial={g.isToday ? undefined : 10}
               >
                 {g.items.map((e) => (
                   <EventCard key={e.id} event={e} variant="default" />
                 ))}
               </CollapsibleGroup>
             ))}
+
+            {/* 更早的记录 — 默认折叠 */}
+            {older.length > 0 && (
+              <CollapsibleGroup
+                dateLabel={olderLabel}
+                count={olderTotal}
+                dateCode="•••"
+              >
+                {older.map((e) => (
+                  <EventCard key={e.id} event={e} variant="default" />
+                ))}
+              </CollapsibleGroup>
+            )}
           </div>
         </div>
 
@@ -125,7 +140,9 @@ export default async function HomePage({ searchParams }: PageProps) {
 
         {events.length > 0 && (
           <p className="mt-6 text-center text-xs text-ink-500 dark:text-ink-400">
-            共 <span className="tnum">{events.length}</span> 条精选 · 数据每小时自动更新
+            共 <span className="tnum">{events.length}</span> 条精选
+            {older.length > 0 && <span>（含 <span className="tnum">{olderTotal}</span> 条更早记录）</span>}
+            {' · '}数据每小时自动更新
           </p>
         )}
       </div>
@@ -167,16 +184,6 @@ function EmptyState({ activeCat }: { activeCat: CategoryId | 'all' }) {
       </div>
     </div>
   );
-}
-
-function groupByDay(events: RegulatoryEvent[]) {
-  const map = new Map<string, RegulatoryEvent[]>();
-  for (const e of events) {
-    const key = format(new Date(e.publishedAt), 'M月d日', { locale: zhCN });
-    if (!map.has(key)) map.set(key, []);
-    map.get(key)!.push(e);
-  }
-  return Array.from(map.entries()).map(([dateLabel, items]) => ({ dateLabel, items }));
 }
 
 function computeCategoryCounts(events: RegulatoryEvent[]): Record<string, number> {
