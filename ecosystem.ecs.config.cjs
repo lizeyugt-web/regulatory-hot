@@ -7,6 +7,11 @@
  *   pm2 start ecosystem.ecs.config.cjs
  *   pm2 save
  *   pm2 logs
+ *
+ * 稳定性配置:
+ * - restart_delay: 防止快速重启循环
+ * - WAL 模式: prisma.ts 中已配置
+ * - max_memory_restart: 合理的内存上限
  */
 
 module.exports = {
@@ -31,15 +36,16 @@ module.exports = {
 
       autorestart: true,
       max_restarts: 20,
+      restart_delay: 10000,
       min_uptime: '30s',
-      max_memory_restart: '350M',
+      max_memory_restart: '400M',
       kill_timeout: 45000,
       wait_ready: false,
       exec_mode: 'fork',
     },
     {
       name: 'reg-web',
-      script: 'node_modules/.bin/next',
+      script: 'node_modules/next/dist/bin/next',
       args: 'start -p 3457 -H 0.0.0.0',
       cwd: '/root/regulatory-hot/regulatory-hot',
 
@@ -55,9 +61,10 @@ module.exports = {
 
       autorestart: true,
       max_restarts: 10,
-      min_uptime: '10s',
-      max_memory_restart: '300M',
-      kill_timeout: 10000,
+      restart_delay: 15000,
+      min_uptime: '30s',
+      max_memory_restart: '500M',
+      kill_timeout: 15000,
       exec_mode: 'fork',
     },
   ],
