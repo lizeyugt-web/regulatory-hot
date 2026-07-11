@@ -26,6 +26,12 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: '管理',
+    items: [
+      { href: 'https://47.107.133.169:3443/dashboard/account', label: '公众号管理', icon: 'wechat', external: true },
+    ],
+  },
+  {
     label: '更多',
     items: [
       { href: '/about',     label: '关于',     icon: 'info' },
@@ -45,6 +51,7 @@ const ICON_PATHS: Record<string, string> = {
   info:     'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
   history:  'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
   message:  'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+  wechat:   'M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-4.064 0-7.357 2.601-7.357 5.81 0 3.207 3.293 5.808 7.357 5.808.972 0 1.916-.163 2.791-.467a.795.795 0 01.66.09l1.758 1.029a.299.299 0 00.153.05.27.27 0 00.267-.272c0-.066-.027-.13-.045-.197l-.359-1.367a.546.546 0 01.196-.615C24.057 18.045 25 16.56 25 14.668c0-3.208-3.293-5.81-7.357-5.81zm-3.566 3.223c.594 0 1.074.489 1.074 1.09a1.082 1.082 0 01-1.074 1.09c-.593 0-1.074-.488-1.074-1.09 0-.601.48-1.09 1.074-1.09zm5.374 0c.594 0 1.074.489 1.074 1.09a1.082 1.082 0 01-1.074 1.09c-.594 0-1.074-.488-1.074-1.09 0-.601.48-1.09 1.074-1.09z',
 };
 
 function Icon({ name }: { name: string }) {
@@ -114,18 +121,33 @@ export function SiteSidebar() {
             <ul className="space-y-0.5">
               {section.items.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={clsx('nav-item', isActive(item.href) && 'nav-item-active')}
-                  >
-                    <Icon name={item.icon} />
-                    <span className="flex-1">{item.label}</span>
-                    {(item as { shortcut?: string }).shortcut && (
-                      <kbd className="hidden rounded border border-ink-200 bg-white/60 px-1 py-0.5 text-[10px] font-mono text-ink-400 group-hover:inline-block dark:border-ink-700 dark:bg-ink-800/40 lg:inline-block">
-                        {(item as { shortcut?: string }).shortcut}
-                      </kbd>
-                    )}
-                  </Link>
+                  {('external' in item) && (item as any).external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="nav-item"
+                    >
+                      <Icon name={item.icon} />
+                      <span className="flex-1">{item.label}</span>
+                      <svg className="h-3 w-3 text-ink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={clsx('nav-item', isActive(item.href) && 'nav-item-active')}
+                    >
+                      <Icon name={item.icon} />
+                      <span className="flex-1">{item.label}</span>
+                      {(item as { shortcut?: string }).shortcut && (
+                        <kbd className="hidden rounded border border-ink-200 bg-white/60 px-1 py-0.5 text-[10px] font-mono text-ink-400 group-hover:inline-block dark:border-ink-700 dark:bg-ink-800/40 lg:inline-block">
+                          {(item as { shortcut?: string }).shortcut}
+                        </kbd>
+                      )}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
