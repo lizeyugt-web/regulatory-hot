@@ -16,6 +16,39 @@
 
 module.exports = {
   apps: [
+    // ===== 微信公众号轮询采集 =====
+    {
+      name: 'mp-watcher',
+      script: 'scripts/watcher.cjs',
+      cwd: '/root/regulatory-hot',
+
+      env: {
+        NODE_ENV: 'production',
+        WX_EXPORTER_URL: 'https://127.0.0.1:3443',
+        WX_AUTH_KEY: 'def858160e3441dd88a377cba24ce0be',
+        GITHUB_TOKEN: 'ghp_REMOVED',
+        WATCHER_INTERVAL: '30',
+        WATCHER_ARTICLE_LIMIT: '5',
+        CONTENT_CONCURRENCY: '3',
+        CONTENT_MAX_CHARS: '30000',
+        WX_TLS_REJECT_UNAUTHORIZED: '0',
+      },
+
+      error_file: '/root/regulatory-hot/logs/watcher-err.log',
+      out_file: '/root/regulatory-hot/logs/watcher-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
+      merge_logs: true,
+
+      autorestart: true,
+      max_restarts: 10,
+      restart_delay: 10000,
+      min_uptime: '30s',
+      max_memory_restart: '200M',
+      kill_timeout: 30000,
+      exec_mode: 'fork',
+    },
+
+    // ===== ECS 全流程守护（微信导入 + FDA采集 + AI分析） =====
     {
       name: 'reg-daemon',
       script: 'scripts/ecs_daemon.cjs',
