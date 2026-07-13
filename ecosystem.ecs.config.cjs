@@ -24,9 +24,8 @@ module.exports = {
 
       env: {
         NODE_ENV: 'production',
-        WX_EXPORTER_URL: 'https://127.0.0.1:3443',
-        WX_AUTH_KEY: 'def858160e3441dd88a377cba24ce0be',
-        GITHUB_TOKEN: 'ghp_REMOVED',
+        WX_EXPORTER_URL: 'http://127.0.0.1:19000',
+        WX_AUTH_KEY: '4f0f24e84391403191844e70df8b2587',
         WATCHER_INTERVAL: '30',
         WATCHER_ARTICLE_LIMIT: '5',
         CONTENT_CONCURRENCY: '3',
