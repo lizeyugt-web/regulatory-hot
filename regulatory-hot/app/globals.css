@@ -118,7 +118,7 @@ html.dark {
   }
 
   .main-area {
-    @apply min-w-0 flex-1 py-5 lg:py-6;
+    @apply min-w-0 flex-1 flex flex-col py-5 lg:py-6;
   }
 
   /* 卡片 — Anthropic 风格：暖光阴影 + 12-16px 圆角 */
