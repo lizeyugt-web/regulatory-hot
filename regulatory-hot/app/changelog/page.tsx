@@ -50,7 +50,7 @@ const ENTRIES = [
 
 export default function ChangelogPage() {
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="mx-auto max-w-2xl space-y-5">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-ink-50">更新日志</h1>
         <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">记录每一次重要迭代</p>

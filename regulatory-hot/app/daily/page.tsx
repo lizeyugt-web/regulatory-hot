@@ -49,7 +49,7 @@ export default async function DailyPage() {
   const totalSelected = recentEvents.filter((e) => e.selected).length;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[14rem_1fr]">
+    <div className="mx-auto max-w-6xl grid gap-6 lg:grid-cols-[14rem_1fr]">
       {/* === 左侧：日报说明 === */}
       <aside className="hidden lg:block">
         <div className="sticky top-4 space-y-4">

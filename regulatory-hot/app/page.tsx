@@ -72,7 +72,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   const catCounts = computeCategoryCounts(allEvents);
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1fr_15rem]">
+    <div className="mx-auto max-w-6xl grid gap-4 xl:grid-cols-[1fr_15rem]">
       <div className="min-w-0">
         {/* 顶部标题 + 统计 */}
         <header className="mb-4">

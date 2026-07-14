@@ -2,9 +2,11 @@ import { EventCard } from '@/components/event/EventCard';
 import { SmartSearchBar } from '@/components/event/SmartSearchBar';
 import { CollapsibleGroup } from '@/components/event/CollapsibleGroup';
 import { HotTopicsPanel } from '@/components/event/HotTopicsPanel';
+import { AiProgressBar } from '@/components/event/AiProgressBar';
 import { CATEGORIES, type CategoryId } from '@/lib/config';
 import { getEvents, getStats } from '@/lib/events-data';
 import { buildTimeline } from '@/lib/timeline';
+import type { AiProgress } from '@/lib/events-data';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 
@@ -24,7 +26,11 @@ export default async function AllPage({ searchParams }: PageProps) {
 
   const allEvents = await getEvents();
   const stats = await getStats();
-  const aiProgress = { completed: allEvents.filter(e => e.aiAnalyzedAt).length, total: allEvents.length };
+  const aiProgress: AiProgress = {
+    total: allEvents.length,
+    completed: allEvents.filter(e => e.aiAnalyzedAt).length,
+    pending: allEvents.length - allEvents.filter(e => e.aiAnalyzedAt).length,
+  };
 
   let events = allEvents;
 
@@ -64,7 +70,7 @@ export default async function AllPage({ searchParams }: PageProps) {
   const groupArr = recent.map(g => [g.dateLabel, g] as const);
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1fr_15rem]">
+    <div className="mx-auto max-w-6xl grid gap-4 xl:grid-cols-[1fr_15rem]">
       <div className="min-w-0">
         {/* 顶部标题 */}
         <header className="mb-4">
@@ -105,7 +111,7 @@ export default async function AllPage({ searchParams }: PageProps) {
                 count={g.items.length}
                 dateCode={g.dateCode}
                 isToday={g.isToday}
-                maxInitial={g.isToday ? undefined : 10}
+                maxInitial={g.isToday ? undefined : 200}
               >
                 {g.items.map((e) => (
                   <EventCard key={e.id} event={e} variant="default" />

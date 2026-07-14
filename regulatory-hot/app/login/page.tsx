@@ -2,7 +2,7 @@ export const metadata = { title: '内部员工登录' };
 
 export default function LoginPage() {
   return (
-    <div className="max-w-md">
+    <div className="mx-auto max-w-md">
       <header className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-ink-50">内部员工登录</h1>
         <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">仅供 RegHot 编辑团队使用</p>

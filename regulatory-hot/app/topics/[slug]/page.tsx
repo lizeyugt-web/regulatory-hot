@@ -35,7 +35,7 @@ export default async function TopicDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl">
       <header className="mb-5">
         <p className="text-xs text-ink-500 dark:text-ink-400">主题</p>
         <div className="flex items-baseline gap-3">

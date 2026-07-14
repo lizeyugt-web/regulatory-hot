@@ -47,7 +47,7 @@ export function DetailView({ event, prev, next, related, catLabel }: Props) {
   const dateStr = format(publishedDate, 'yyyy年M月d日 HH:mm', { locale: zhCN });
 
   return (
-    <div className="max-w-3xl">
+    <div className="mx-auto max-w-3xl">
       {/* 面包屑导航 */}
       <nav aria-label="面包屑" className="mb-4 flex items-center gap-1.5 text-xs text-ink-500 dark:text-ink-400">
         <Link href="/" className="hover:text-brand-600 dark:hover:text-brand-400">首页</Link>

@@ -72,7 +72,7 @@ export default async function TopicsPage() {
   const tags = topics.filter((t) => t.type === 'tag').sort((a, b) => b.itemCount - a.itemCount).slice(0, 12);
 
   return (
-    <div>
+    <div className="mx-auto max-w-5xl">
       <header className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-ink-50">主题</h1>
         <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">

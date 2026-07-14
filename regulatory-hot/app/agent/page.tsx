@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function AgentPage() {
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-ink-50">Agent 接入</h1>
         <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">
