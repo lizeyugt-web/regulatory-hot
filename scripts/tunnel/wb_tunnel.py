@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-WorkBuddy 反代 SSH 反向隧道守护（Windows → 新ECS）
+WorkBuddy 反代 SSH 反向隧道守护（Windows → 新ECS + 旧服务器）
 
 链路：
-  ECS 127.0.0.1:8002  ──SSH反向隧道(22)──>  本机 127.0.0.1:8002 (Antigravity → WorkBuddy 积分)
+  新ECS  127.0.0.1:8002 ─┐
+                          ├──SSH反向隧道(22)──> 本机 127.0.0.1:8002 (Antigravity → WorkBuddy 积分)
+  旧服务器 127.0.0.1:8002 ─┘
 
-特性：断线自动重连、保活、日志轮转。
-自启：Windows 计划任务「RegSci-WBTunnel」（ONLOGON，pythonw 隐藏运行）。
+特性：每个目标独立重连、保活、日志轮转。
+自启：Windows 启动文件夹「RegSci-WBTunnel.vbs」（pythonw 隐藏运行）。
 
 手动启动:  python scripts/tunnel/wb_tunnel.py
-手动停止:  python scripts/tunnel/wb_tunnel.py --stop   (或杀掉 python/ssh 进程)
 """
 
 import os
@@ -21,13 +22,17 @@ import datetime
 # ===== 配置 =====
 SSH_EXE = r"C:\Windows\System32\OpenSSH\ssh.exe"
 KEY = r"C:\Users\zeyuli\.ssh\regsci_tunnel_ed25519"
-REMOTE = "root@8.141.89.193"
-# ECS 侧绑定 127.0.0.1:8002 → 本机 127.0.0.1:8002
-FORWARD = "127.0.0.1:8002:127.0.0.1:8002"
-LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tunnel.log")
-PID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tunnel.pid")
-RETRY_DELAY = 8          # 断线重连间隔（秒）
-LOG_MAX_BYTES = 2 * 1024 * 1024  # 日志轮转阈值 2MB
+# (SSH目标, 远端绑定) — 远端 127.0.0.1:8002 → 本机 127.0.0.1:8002
+TARGETS = [
+    ("root@8.141.89.193", "127.0.0.1:8002:127.0.0.1:8002"),    # 新ECS（生产 regsci.cn）
+    ("root@47.107.133.169", "127.0.0.1:8002:127.0.0.1:8002"),  # 旧轻量云（reg-daemon 采集分析）
+]
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(BASE_DIR, "tunnel.log")
+PID_FILE = os.path.join(BASE_DIR, "tunnel.pid")
+CHECK_INTERVAL = 5       # 进程健康检查间隔（秒）
+RETRY_DELAY = 8          # 断线基础重连间隔（秒）
+LOG_MAX_BYTES = 2 * 1024 * 1024
 
 
 def log(msg):
@@ -36,7 +41,6 @@ def log(msg):
     print(line, flush=True)
     try:
         if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > LOG_MAX_BYTES:
-            # 简单轮转：保留旧日志为 .1
             try:
                 os.replace(LOG_FILE, LOG_FILE + ".1")
             except OSError:
@@ -47,11 +51,11 @@ def log(msg):
         pass
 
 
-def build_cmd():
+def build_cmd(remote, forward):
     return [
         SSH_EXE,
         "-N", "-T",
-        "-R", FORWARD,
+        "-R", forward,
         "-i", KEY,
         "-o", "BatchMode=yes",
         "-o", "ExitOnForwardFailure=yes",
@@ -60,41 +64,54 @@ def build_cmd():
         "-o", "TCPKeepAlive=yes",
         "-o", "StrictHostKeyChecking=accept-new",
         "-o", "ConnectTimeout=15",
-        REMOTE,
+        remote,
     ]
 
 
 def main():
-    if "--stop" in sys.argv:
-        log("手动停止：请直接结束隧道 python 进程与其子 ssh 进程")
-        return
-
     with open(PID_FILE, "w") as f:
         f.write(str(os.getpid()))
 
-    log(f"隧道守护启动 pid={os.getpid()}  {REMOTE}  -R {FORWARD}")
-    failures = 0
-    while True:
-        try:
-            proc = subprocess.Popen(
-                build_cmd(),
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.PIPE,
-                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-            )
-            log(f"ssh 已启动 pid={proc.pid}")
-            _, stderr = proc.communicate()
-            rc = proc.returncode
-            err = (stderr or b"").decode("utf-8", "ignore").strip()[-300:]
-            failures += 1
-            log(f"ssh 退出 rc={rc}（第 {failures} 次）{err}")
-        except Exception as e:  # noqa: BLE001
-            failures += 1
-            log(f"启动异常（第 {failures} 次）: {e}")
+    log(f"隧道守护启动 pid={os.getpid()}  目标数={len(TARGETS)}")
+    procs = {}    # remote -> Popen
+    fails = {}    # remote -> 连续失败次数
+    next_try = {} # remote -> 下次允许重试的时间戳
 
-        delay = min(RETRY_DELAY * max(1, failures), 120)  # 退避上限 2 分钟
-        log(f"{delay}s 后重连...")
-        time.sleep(delay)
+    while True:
+        now = time.time()
+        for remote, forward in TARGETS:
+            proc = procs.get(remote)
+            alive = proc is not None and proc.poll() is None
+            if alive:
+                continue
+
+            if proc is not None:
+                # 刚退出
+                fails[remote] = fails.get(remote, 0) + 1
+                backoff = min(RETRY_DELAY * fails[remote], 120)
+                next_try[remote] = now + backoff
+                log(f"[{remote}] ssh 退出 rc={proc.returncode}（第 {fails[remote]} 次），{backoff}s 后重连")
+                procs[remote] = None
+                continue
+
+            if now < next_try.get(remote, 0):
+                continue
+
+            try:
+                p = subprocess.Popen(
+                    build_cmd(remote, forward),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                )
+                procs[remote] = p
+                log(f"[{remote}] ssh 已启动 pid={p.pid}  -R {forward}")
+            except Exception as e:  # noqa: BLE001
+                fails[remote] = fails.get(remote, 0) + 1
+                next_try[remote] = now + min(RETRY_DELAY * fails[remote], 120)
+                log(f"[{remote}] 启动异常（第 {fails[remote]} 次）: {e}")
+
+        time.sleep(CHECK_INTERVAL)
 
 
 if __name__ == "__main__":
