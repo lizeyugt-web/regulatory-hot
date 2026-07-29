@@ -1,15 +1,16 @@
 /**
- * 硅基流动 API 客户端 — 统一 AI 调用层
+ * 统一 AI 客户端 — 兼容 OpenAI Chat Completions 协议
  *
- * 兼容 OpenAI Chat Completions 协议
- * Base URL: https://api.siliconflow.cn/v1
+ * Chat 类调用统一走 WorkBuddy 积分反代（config/ai-models.json，默认 127.0.0.1:8002）
+ * Embeddings / Rerank 保留硅基流动（反代不支持这两类 API）
  *
  * 封装：
  *   - Chat Completions（预筛 / 五维评分 / 翻译摘要）
- *   - Embeddings（语义聚类）
- *   - Rerank（聚类精排）
+ *   - Embeddings（语义聚类，硅基流动）
+ *   - Rerank（聚类精排，硅基流动）
  */
-import { AI_API, PRE_FILTER, SCORING_AI, EMBEDDING_CONFIG, RERANKER_CONFIG } from './config';
+import { PRE_FILTER, SCORING_AI, EMBEDDING_CONFIG, RERANKER_CONFIG } from './config';
+import { getAIModuleConfig } from './ai-config';
 
 // ===========================================================================
 // 类型定义
@@ -82,8 +83,9 @@ function safeJsonParse<T>(text: string, fallback: T): T {
 export async function chatCompletion(
   options: ChatCompletionOptions,
 ): Promise<ChatCompletionResponse> {
+  const scoringCfg = getAIModuleConfig('scoring');
   const {
-    model = SCORING_AI.model,
+    model = scoringCfg.model,
     messages,
     maxTokens = 1024,
     temperature = 0,
@@ -101,18 +103,18 @@ export async function chatCompletion(
     body.response_format = { type: 'json_object' };
   }
 
-  const response = await fetch(`${AI_API.baseUrl}/chat/completions`, {
+  const response = await fetch(`${scoringCfg.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${AI_API.apiKey}`,
+      Authorization: `Bearer ${scoringCfg.apiKey}`,
     },
     body: JSON.stringify(body),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`SiliconFlow API error [${response.status}]: ${errorText}`);
+    throw new Error(`AI 反代 error [${response.status}]: ${errorText}`);
   }
 
   const data = await response.json();
@@ -143,10 +145,11 @@ export async function preFilterWithAI(
   title: string,
   content: string,
 ): Promise<PreFilterResult & { cost: number }> {
+  const prefilterCfg = getAIModuleConfig('prefilter');
   const prompt = `${PRE_FILTER.prompt}\n\n标题：${title}\n内容：${content.substring(0, 2000)}`;
 
   const result = await chatCompletion({
-    model: PRE_FILTER.model,
+    model: prefilterCfg.model,
     messages: [
       { role: 'system', content: '你是一个监管信息筛选助手，只输出 JSON。' },
       { role: 'user', content: prompt },
@@ -187,10 +190,11 @@ export async function scoreWithAI(
   sourceName: string,
   category: string,
 ): Promise<FiveDimensionScores & { cost: number }> {
+  const scoringCfg = getAIModuleConfig('scoring');
   const prompt = `${SCORING_AI.prompt}\n\n来源：${sourceName}\n分类：${category}\n标题：${title}\n内容：${content.substring(0, 3000)}`;
 
   const result = await chatCompletion({
-    model: SCORING_AI.model,
+    model: scoringCfg.model,
     messages: [
       { role: 'system', content: '你是一个医药监管信息评分专家，只输出 JSON。' },
       { role: 'user', content: prompt },
@@ -231,14 +235,15 @@ function clampScore(value: unknown): number {
 export async function getEmbedding(
   text: string,
 ): Promise<EmbeddingResponse> {
-  const response = await fetch(`${AI_API.baseUrl}/embeddings`, {
+  const embCfg = getAIModuleConfig('embedding');
+  const response = await fetch(`${embCfg.baseUrl}/embeddings`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${AI_API.apiKey}`,
+      Authorization: `Bearer ${embCfg.apiKey}`,
     },
     body: JSON.stringify({
-      model: EMBEDDING_CONFIG.model,
+      model: embCfg.model,
       input: text.substring(0, EMBEDDING_CONFIG.maxInputTokens),
       dimensions: EMBEDDING_CONFIG.dimensions,
     }),
@@ -268,14 +273,15 @@ export async function getEmbedding(
 export async function getBatchEmbeddings(
   texts: string[],
 ): Promise<EmbeddingResponse[]> {
-  const response = await fetch(`${AI_API.baseUrl}/embeddings`, {
+  const embCfg = getAIModuleConfig('embedding');
+  const response = await fetch(`${embCfg.baseUrl}/embeddings`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${AI_API.apiKey}`,
+      Authorization: `Bearer ${embCfg.apiKey}`,
     },
     body: JSON.stringify({
-      model: EMBEDDING_CONFIG.model,
+      model: embCfg.model,
       input: texts.map((t) => t.substring(0, EMBEDDING_CONFIG.maxInputTokens)),
       dimensions: EMBEDDING_CONFIG.dimensions,
     }),
@@ -322,14 +328,15 @@ export async function rerank(
   documents: string[],
   topN: number = RERANKER_CONFIG.topN,
 ): Promise<RerankResult[]> {
-  const response = await fetch(`${AI_API.baseUrl}/rerank`, {
+  const rrCfg = getAIModuleConfig('reranker');
+  const response = await fetch(`${rrCfg.baseUrl}/rerank`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${AI_API.apiKey}`,
+      Authorization: `Bearer ${rrCfg.apiKey}`,
     },
     body: JSON.stringify({
-      model: RERANKER_CONFIG.model,
+      model: rrCfg.model,
       query,
       documents,
       top_n: topN,

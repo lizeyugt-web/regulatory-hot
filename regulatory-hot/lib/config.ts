@@ -520,17 +520,17 @@ export function isSelected(
 }
 
 // ===========================================================================
-// 7. AI 模型配置 — 从环境变量读取
+// 7. AI 模型配置 — 已迁移至 config/ai-models.json（2026-07-29）
 // ===========================================================================
-// 硅基流动 (SiliconFlow) — 兼容 OpenAI Chat Completions 协议
-// Base URL: https://api.siliconflow.cn/v1
-// Embedding: https://api.siliconflow.cn/v1/embeddings
-// Reranker: https://api.siliconflow.cn/v1/rerank
+// ⚠️ 端点/Key/每模块模型 统一由项目根 config/ai-models.json 管理
+//    （lib/ai-config.ts 加载；Chat 走 WorkBuddy 积分反代，Embedding/Rerank 走硅基流动）
+//    此处仅保留 Prompt 模板与少量兼容导出，不再维护模型名/端点。
 // ===========================================================================
 
+/** @deprecated 使用 lib/ai-config.ts 的 getAIModuleConfig() 代替 */
 export const AI_API = {
-  baseUrl: process.env.SILICONFLOW_BASE_URL ?? 'https://api.siliconflow.cn/v1',
-  apiKey: process.env.SILICONFLOW_API_KEY ?? '',
+  baseUrl: process.env.WB_PROXY_BASE_URL ?? 'http://127.0.0.1:8002/v1',
+  apiKey: process.env.WB_PROXY_API_KEY ?? '',
 } as const;
 
 // ===========================================================================

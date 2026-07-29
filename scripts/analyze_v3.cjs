@@ -30,16 +30,19 @@ function loadEnv(file) {
 }
 loadEnv(path.join(__dirname, '..', 'regulatory-hot', '.env'));
 
-// ===== AI Config =====
+// ===== AI Config（统一走 config/ai-models.json → WorkBuddy 积分反代）=====
+const { getModuleConfig } = require('./ai_config.cjs');
+const ANALYZE_CFG = getModuleConfig('analyze');
+const TRANSLATE_CFG = getModuleConfig('translate');
 const AI = {
-  baseUrl: process.env.SILICONFLOW_BASE_URL || 'https://api.siliconflow.cn/v1',
-  apiKey: process.env.SILICONFLOW_API_KEY || '',
-  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen2.5-72B-Instruct',
-  translateModel: process.env.SILICONFLOW_TRANSLATE_MODEL || 'Qwen/Qwen3.5-35B-A3B',
+  baseUrl: ANALYZE_CFG.baseUrl,
+  apiKey: ANALYZE_CFG.apiKey,
+  model: ANALYZE_CFG.model,
+  translateModel: TRANSLATE_CFG.model,
   concurrency: parseInt(process.env.AI_CONCURRENCY || '8'),
   maxTokens: 600,
   temperature: 0.3,
-  maxRetries: 2,
+  maxRetries: ANALYZE_CFG.maxRetries || 2,
 };
 
 // ===== Utilities =====
@@ -52,19 +55,15 @@ function estimateTokens(text) {
 }
 
 async function chatCompletion(messages, opts = {}) {
-  const { maxTokens = 1024, temperature = 0.3 } = opts;
-  if (!AI.apiKey) throw new Error('SILICONFLOW_API_KEY 未配置');
+  const { model = AI.model, maxTokens = 1024, temperature = 0.3 } = opts;
+  if (!AI.apiKey) throw new Error('反代 API Key 未配置（config/ai-models.json provider.apiKey）');
 
   for (let attempt = 0; attempt < AI.maxRetries; attempt++) {
     try {
       const res = await fetch(`${AI.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AI.apiKey}` },
-        body: JSON.stringify({
-          model: AI.model, messages,
-          max_tokens: maxTokens, temperature,
-          chat_template_kwargs: { enable_thinking: false },
-        }),
+        body: JSON.stringify({ model, messages, max_tokens: maxTokens, temperature }),
       });
       if (!res.ok) {
         if (res.status === 429) { await sleep((attempt + 1) * 2000); continue; }
@@ -192,9 +191,9 @@ async function analyzeOne(event) {
       const tp = buildTranslatePrompt(event);
       const tRes = await chatCompletion([
         { role: 'user', content: tp },
-      ], { maxTokens: 2048, temperature: 0.1 });
+      ], { model: AI.translateModel, maxTokens: 2048, temperature: 0.1 });
       event.contentCn = tRes.content || event.contentOriginal;
-      event.aiTranslateModel = AI.translateModel;
+      event.aiTranslateModel = tRes.model || AI.translateModel;
     } catch {
       event.contentCn = event.contentOriginal; // 降级保留原文
     }

@@ -40,21 +40,22 @@ function loadEnv() {
 }
 loadEnv();
 
+// 统一配置：config/ai-models.json → WorkBuddy 积分反代
+const { getModuleConfig } = require('./ai_config.cjs');
+const _analyzeCfg = getModuleConfig('analyze');
 const AI_CONFIG = {
-  baseUrl: process.env.SILICONFLOW_BASE_URL || 'https://api.siliconflow.cn/v1',
-  apiKey: process.env.SILICONFLOW_API_KEY || '',
-  // 一步完成模型：默认用 Qwen2.5-72B-Instruct（直接输出 JSON，不进入 thinking 模式）
-  // Qwen3.5-35B-A3B 在硅基流动上总是 thinking，content 为空
-  // 可通过 env SILICONFLOW_MODEL / AI_CONCURRENCY 覆盖
-  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen2.5-72B-Instruct',
+  baseUrl: _analyzeCfg.baseUrl,
+  apiKey: _analyzeCfg.apiKey,
+  // 模型由 config/ai-models.json modules.analyze 管理，env AI_MODEL_ANALYZE 可覆盖
+  model: _analyzeCfg.model,
   maxTokens: 600,                        // 摘要+推荐+评分 ≈ 400 tokens
   temperature: 0.3,
   delayMs: 50,                           // 12 并发后降低单批间隔
-  maxRetries: 2,                         // 失败快速跳过
+  maxRetries: _analyzeCfg.maxRetries || 2,
   concurrency: parseInt(process.env.AI_CONCURRENCY || '12'),
 };
 
-const PRICING = { 'deepseek-ai/DeepSeek-V3.2': { input: 4.00, output: 6.00 } };
+const PRICING = { 'deepseek-v4-pro': { input: 4.00, output: 6.00 } };
 
 // ===========================================================================
 // 工具函数
@@ -73,7 +74,7 @@ function calcCost(model, inputTokens, outputTokens) {
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function chatCompletion(messages, { maxTokens = 1024, temperature = 0.3 } = {}) {
-  if (!AI_CONFIG.apiKey) throw new Error('SILICONFLOW_API_KEY 未配置');
+  if (!AI_CONFIG.apiKey) throw new Error('反代 API Key 未配置（config/ai-models.json）');
 
   let lastError = null;
   for (let attempt = 0; attempt < AI_CONFIG.maxRetries; attempt++) {
@@ -89,8 +90,6 @@ async function chatCompletion(messages, { maxTokens = 1024, temperature = 0.3 } 
           messages,
           max_tokens: maxTokens,
           temperature,
-          // 关掉 Qwen thinking 模式（确保 content 直接有内容）
-          chat_template_kwargs: { enable_thinking: false },
         }),
       });
 

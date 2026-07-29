@@ -19,3 +19,5 @@ $null
 # Temp/debug files
 _debug_*.html
 *.log
+scripts/tunnel/tunnel.log*
+scripts/tunnel/tunnel.pid

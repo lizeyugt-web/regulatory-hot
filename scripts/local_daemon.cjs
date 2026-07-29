@@ -438,9 +438,17 @@ function checkEnvironment() {
         if (!process.env[k]) process.env[k] = t.slice(eq + 1).trim();
       }
     } catch {}
-    checks.push(process.env.SILICONFLOW_API_KEY ? '✅ SILICONFLOW_API_KEY' : '❌ SILICONFLOW_API_KEY 未配置');
-  } else {
-    checks.push('❌ regulatory-hot/.env 不存在');
+  }
+
+  // 统一 AI 配置检查（config/ai-models.json → WorkBuddy 积分反代）
+  let aiConfigOK = false;
+  try {
+    const { getModuleConfig } = require('./ai_config.cjs');
+    const cfg = getModuleConfig('analyze');
+    aiConfigOK = !!cfg.apiKey;
+    checks.push(cfg.apiKey ? `✅ AI 反代 (${cfg.baseUrl}, analyze=${cfg.model})` : '❌ AI 反代 apiKey 为空');
+  } catch (e) {
+    checks.push(`❌ ai-models.json 读取失败: ${e.message}`);
   }
 
   // 3. regulatory.db
@@ -471,8 +479,8 @@ function checkEnvironment() {
   log('');
 
   // 致命错误
-  if (!process.env.SILICONFLOW_API_KEY) {
-    log('❌ 缺少 SILICONFLOW_API_KEY，AI 分析无法运行', 'ERROR');
+  if (!aiConfigOK) {
+    log('❌ AI 反代配置无效（config/ai-models.json），AI 分析无法运行', 'ERROR');
     return false;
   }
   return true;

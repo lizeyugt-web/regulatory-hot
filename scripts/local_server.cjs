@@ -9,7 +9,7 @@
  *
  * 环境变量（从 regulatory-hot/.env 自动加载）:
  *   WX_AUTH_KEY        - 微信认证密钥（私聊告知）
- *   SILICONFLOW_API_KEY - AI分析密钥
+ *   SILICONFLOW_API_KEY - 硅基流动密钥（仅 embedding/reranker 聚类用；chat 调用已统一走 config/ai-models.json → WorkBuddy 积分反代）
  *   PORT                - 面板端口 (默认 3458)
  */
 

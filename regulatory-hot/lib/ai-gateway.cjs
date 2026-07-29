@@ -13,25 +13,30 @@
 const fs = require('fs');
 const path = require('path');
 
+// 统一配置：config/ai-models.json → WorkBuddy 积分反代
+const { getModuleConfig } = require('../../scripts/ai_config.cjs');
+
 // ===========================================================================
 // 配置
 // ===========================================================================
+const _analyzeCfg = getModuleConfig('analyze');
 const DEFAULT_CONFIG = {
-  baseUrl: process.env.SILICONFLOW_BASE_URL || 'https://api.siliconflow.cn/v1',
-  apiKey: process.env.SILICONFLOW_API_KEY || '',
-  // 改用 Qwen3.5-35B-A3B：~3x 快于 DeepSeek-V3.2，价格更便宜
-  // 可通过 env SILICONFLOW_MODEL 覆盖
-  model: process.env.SILICONFLOW_MODEL || 'Qwen/Qwen3.5-35B-A3B',
+  baseUrl: _analyzeCfg.baseUrl,
+  apiKey: _analyzeCfg.apiKey,
+  // 模型统一由 config/ai-models.json modules.analyze 管理（默认 deepseek-v4-flash）
+  // 可通过 env AI_MODEL_ANALYZE 覆盖
+  model: _analyzeCfg.model,
   maxTokens: 600,         // 摘要 150-250 字 + 推荐 + 评分 ≈ 400 tokens，省一半
   temperature: 0.3,
-  concurrency: 12,        // 5 -> 12（硅基流动允许 ~60 req/min，12 并发安全）
-  maxRetries: 2,          // 3 -> 2（失败快速跳过）
-  requestTimeoutMs: 25000 // 30s -> 25s 硬超时
+  concurrency: 12,
+  maxRetries: _analyzeCfg.maxRetries || 2,
+  requestTimeoutMs: _analyzeCfg.timeoutMs || 60000
 };
 
 const PRICING = {
-  'Qwen/Qwen3.5-35B-A3B': { input: 0.40, output: 3.20 },
-  'deepseek-ai/DeepSeek-V3.2': { input: 1.33, output: 4.00 },
+  // WorkBuddy 积分制 — 不再按 token 计费，cost 仅作相对量级参考
+  'deepseek-v4-flash': { input: 0.40, output: 1.60 },
+  'deepseek-v4-pro': { input: 1.33, output: 4.00 },
   default: { input: 1.00, output: 2.00 },
 };
 
@@ -69,7 +74,7 @@ class AIGateway {
             if (!trimmed || trimmed.startsWith('#')) continue;
             const eqIdx = trimmed.indexOf('=');
             if (eqIdx === -1) continue;
-            if (trimmed.slice(0, eqIdx).trim() === 'SILICONFLOW_API_KEY') {
+            if (trimmed.slice(0, eqIdx).trim() === 'WB_PROXY_API_KEY') {
               this.config.apiKey = trimmed.slice(eqIdx + 1).trim();
               return;
             }
@@ -90,7 +95,7 @@ class AIGateway {
     } = options;
 
     if (!this.config.apiKey) {
-      throw new Error('SILICONFLOW_API_KEY 未配置');
+      throw new Error('反代 API Key 未配置（config/ai-models.json）');
     }
 
     let lastError = null;

@@ -1,0 +1,32 @@
+{
+  "$comment": "统一 AI 调用配置 — 全站所有 AI 调用的唯一配置源。Chat 类调用统一走 WorkBuddy 积分反代（本地 Antigravity Tools，127.0.0.1:8002）；embedding/reranker 反代不支持，保留硅基流动。环境变量优先于本文件：WB_PROXY_BASE_URL / WB_PROXY_API_KEY / AI_MODEL_<MODULE大写>（如 AI_MODEL_ANALYZE）。",
+  "provider": {
+    "name": "workbuddy-proxy",
+    "baseUrl": "http://127.0.0.1:8002/v1",
+    "apiKey": "sk-EQqrZsIAsyEcN-UnHOozjSV138GbS62mpnYNx6L2SmY",
+    "timeoutMs": 60000,
+    "maxRetries": 2
+  },
+  "availableModels": [
+    { "id": "deepseek-v4-flash", "label": "DeepSeek-V4-Flash", "tier": "省积分", "suggest": "翻译/预筛/批量分类/BD分析" },
+    { "id": "deepseek-v4-pro",   "label": "DeepSeek-V4-Pro",   "tier": "高质量", "suggest": "五维精评/周报报告/全面分析" },
+    { "id": "deepseek-v3-2-volc","label": "DeepSeek-V3.2",     "tier": "均衡",   "suggest": "备选" },
+    { "id": "glm-5.2",           "label": "GLM-5.2",           "tier": "备选",   "suggest": "备选" },
+    { "id": "kimi-k2.6",         "label": "Kimi-K2.6",         "tier": "备选",   "suggest": "备选" }
+  ],
+  "modules": {
+    "analyze":    { "model": "deepseek-v4-flash", "comment": "事件一体化分析：翻译标题+中文摘要+五维评分（analyze_v3.cjs / analyze.cjs / ai-gateway.cjs），量大走省积分" },
+    "translate":  { "model": "deepseek-v4-flash", "comment": "独立全文翻译" },
+    "prefilter":  { "model": "deepseek-v4-flash", "comment": "预筛：判断是否监管相关（lib/ai-client.ts）" },
+    "scoring":    { "model": "deepseek-v4-pro",   "comment": "五维精评（lib/ai-client.ts），要质量" },
+    "bd_analyze": { "model": "deepseek-v4-flash", "comment": "BD 交易情报分析（analyze_bd.cjs，原 Agnes）" },
+    "classify":   { "model": "deepseek-v4-flash", "comment": "批量分类（classify_batch.cjs，原 Agnes）" },
+    "report":     { "model": "deepseek-v4-pro",   "comment": "周报/日报等报告生成，要全面深入" },
+    "embedding":  { "provider": "siliconflow", "model": "Qwen/Qwen3-Embedding-8B", "comment": "语义聚类嵌入 — 反代无 embeddings API，保留硅基流动" },
+    "reranker":   { "provider": "siliconflow", "model": "Qwen/Qwen3-Reranker-8B",  "comment": "聚类精排 — 同上，保留硅基流动" }
+  },
+  "siliconflow": {
+    "baseUrl": "https://api.siliconflow.cn/v1",
+    "apiKey": "env:SILICONFLOW_API_KEY"
+  }
+}
